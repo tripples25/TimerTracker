@@ -1,4 +1,5 @@
 using ChronoFlow.API.DAL;
+using ChronoFlow.API.Infra;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 
@@ -10,8 +11,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.RegisterModules();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("TimeTrackerDB")));
+
+builder.Services.AddSingleton(new Config(true));
 
 var app = builder.Build();
 

@@ -3,5 +3,5 @@
 public class EventTemplate
 {
     public Guid Id { get; set; }
-    public string TemplateName { get; set; }
+    public string Name { get; set; }
 }
