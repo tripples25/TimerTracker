@@ -13,20 +13,20 @@ namespace ChronoFlow.API.Controllers
     public class AuthController : ControllerBase
     {   
         //List<User> users =  
-
         [HttpPost("signin")]
         public async Task<IActionResult> SignInAsync([FromBody] SignInRequest signInRequest)
         {
             var user = users.FirstOrDefault(x => x.Email == signInRequest.Email 
-            && x.Password == signInRequest.Password);
+            && x.Password == signInRequest.Password); // Добавить хеш на пароль
+            // Секрет на Соль можно держать в Config
             if (user is null)
             {
                 return BadRequest(new Response(false, "Invalid credentials."));
             }
             var claims = new List<Claim>
             {
-                new Claim(type: ClaimTypes.Email, value: signInRequest.Email),
-                new Claim(type: ClaimTypes.Name,value: user.Name)
+                new(type: ClaimTypes.Email, value: signInRequest.Email),
+                new(type: ClaimTypes.Name,value: user.Name)
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(
@@ -42,18 +42,13 @@ namespace ChronoFlow.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("user")]
-        public IActionResult GetUser()
-        {
-            var userClaims = User.Claims.Select(x => new UserClaim(x.Type, x.Value)).ToList();
-            return Ok(userClaims);
-        }
-
-        [Authorize]
         [HttpGet("signout")]
-        public async Task SignOutAsync()
+        public async Task<ActionResult> SignOutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return NoContent();
         }
+        
+        // Password Change/Recovery ???
     }
 }
