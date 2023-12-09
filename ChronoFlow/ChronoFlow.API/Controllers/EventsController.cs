@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using ChronoFlow.API.DAL;
+﻿using ChronoFlow.API.DAL;
 using ChronoFlow.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,41 +17,50 @@ public class EventsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetEvent()
+    public async Task<ActionResult<IEnumerable<Event>>> GetEvents([FromRoute] Event searchReq)
     {
         var data = await context.Events.ToListAsync();
-        
-        if (data.Count == 0)
-            return NotFound(data);
 
         return Ok(data);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetSpecificEvent([FromRoute] Event evento)
+    public async Task<ActionResult<Event>> GetSpecificEvent([FromRoute] Guid id)
     {
-        var currentEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == evento.Id);
-        
+        var currentEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
+
         if (currentEvent == null)
             return NotFound();
-        
-        return Ok();
+
+        return Ok(currentEvent);
     }
 
+    // Желательно писать CreateOrUpdate
+    // Или хотя бы не выделять отдельно Patch, а оставлять только POST/PUT
     [HttpPost]
-    public async Task<IActionResult> CreateEvent([FromRoute] Event evento)
+    public async Task<IActionResult> CreateEvent([FromBody] Event evento)
     {
+        evento.Id = Guid.Empty;
         await context.Events.AddAsync(evento);
         await context.SaveChangesAsync();
 
-        return Ok();
+        return Ok(new CreatedOrUpdateResponse
+        {
+            Id = evento.Id,
+        });
     }
 
-    [HttpPatch]
+    public class CreatedOrUpdateResponse
+    {
+        public Guid Id { get; set; }
+        public bool IsCreated { get; set; }
+    }
+
+    [HttpPatch] // лучше было бы [HttpPut]
     public async Task<IActionResult> UpdateEvent([FromRoute] Event evento)
     {
         var eventFromDb = await context.Events.FindAsync(evento.Id);
-        
+
         if (eventFromDb == null)
             return NotFound();
 
@@ -60,36 +68,20 @@ public class EventsController : ControllerBase
         eventFromDb.EndTime = evento.EndTime;
 
         await context.SaveChangesAsync();
-        return Ok();
+        return NoContent();
     }
-    
-    [HttpDelete]
-    public async Task<IActionResult> DeleteEvent([FromRoute] Event evento)
+
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteEvent([FromRoute] Guid id)
     {
-        var eventFromDb = await context.Events.FindAsync(evento.Id);
-        
+        var eventFromDb = await context.Events.FindAsync(id);
+
         if (eventFromDb == null)
             return NotFound();
-        
-        context.Events.Remove(evento);
+
+        context.Events.Remove(eventFromDb);
         await context.SaveChangesAsync();
-        
-        return Ok();
-    }
-    
-    [HttpPut]
-    public async Task<IActionResult> ReplaceEvent([FromRoute] Event evento)
-    {
-        var eventFromDb = await context.Events.FindAsync(evento.Id);
-        
-        if (eventFromDb == null)
-            return NotFound();
-        
-        eventFromDb.Id = evento.Id;
-        eventFromDb.StartTime = evento.StartTime;
-        eventFromDb.EndTime = evento.EndTime;
-        
-        await context.SaveChangesAsync();
-        return Ok();
+
+        return NoContent();
     }
 }

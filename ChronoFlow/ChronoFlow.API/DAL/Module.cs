@@ -11,11 +11,11 @@ public class Module : IModule
     {
         this.configuration = configuration;
     }
-    
+
     public void RegisterModules(IServiceCollection services)
     {
         services.AddSingleton(configuration);
-        
+
         services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
