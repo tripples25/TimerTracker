@@ -4,7 +4,7 @@ using ChronoFlow.API.DAL;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var module = new Module(builder.Configuration);
+var module = new ApplicationModule(builder.Configuration);
 module.RegisterModules(builder.Services);
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

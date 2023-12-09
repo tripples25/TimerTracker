@@ -6,6 +6,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using ChronoFlow.API.Modules.UserModule;
 using System.Security.Cryptography;
+using ChronoFlow.API.DAL;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChronoFlow.API.Controllers
 {
@@ -13,10 +15,9 @@ namespace ChronoFlow.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        //List<User> users =  
-        private readonly DataContext context;
+        private readonly ApplicationDbContext context;
 
-        public UserController(DataContext context)
+        public UserController(ApplicationDbContext context)
         {
             this.context = context;
         }
@@ -39,16 +40,17 @@ namespace ChronoFlow.API.Controllers
                 Email =  request.Email,
                 PasswordHash = passwordHash,
             };
-            context.Users.Add(user);
+            await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
+
             return Ok("User successfully created!");
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLogInRequest request)
         {
-            var user = await context.Users.FirstOrDefault(u => u.Email == request.Email); 
-   
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email); 
+
             if (user is null)
             {
                 return BadRequest("User not found.");
@@ -60,7 +62,7 @@ namespace ChronoFlow.API.Controllers
             var claims = new List<Claim>
             {
                 new(type: ClaimTypes.Email, value: request.Email),
-                new(type: ClaimTypes.Name,value: user.Name)
+                new(type: ClaimTypes.Name,value: user.Name) //  Нет нужды хранить два идентификатора, тк у ниходна и та же цель(лишняя инфа)
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(
@@ -70,7 +72,8 @@ namespace ChronoFlow.API.Controllers
                 {
                     IsPersistent = true,
                     AllowRefresh = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10), // Потестить что через 10 минут можно всё ещё ходить под
+                                                                       // залогиненым пользователем(токен не протух и обновился сам)
                 });
             return Ok(user.Id);
         }
@@ -84,34 +87,37 @@ namespace ChronoFlow.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("change-password")]
+        [HttpPost("password")]
         public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
         {
-            var user = await context.Users.FirstOrDefault(u => u.Email == request.Email);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            if (!VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, /*passwordSalt*/))
+            if (!VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
             {
                 return BadRequest("Password is incorrect.");
             }
 
-            CreatePasswordHash(request.NewPassword,
-            out byte[] passwordHash,
-            out byte[] passwordSalt);
+            CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             await context.SaveChangesAsync();
             return Ok("Password successfully changed!");
         }
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        // out - bad prectice. Лучше использовать хотя бы кортежи(возвращать значение лучше чем out)
+        // Создать класс который считает хеш, не забыть добаить его в DI
+        private (byte[] passwordHash, byte[] passwordSalt) CreatePasswordHash(
+            string password, 
+            byte[] passwordHash,
+            byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512();
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, string passwordHash)
         {
-            using var hmac = new HMACSHA512(passwordSalt);
+            using var hmac = new HMACSHA512();
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
         }

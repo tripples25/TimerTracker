@@ -1,6 +1,6 @@
 ﻿namespace ChronoFlow.API.Models;
 
-public class User
+public class TemplateEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
