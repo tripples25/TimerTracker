@@ -1,4 +1,5 @@
-﻿using ChronoFlow.API.DAL;
+﻿using Azure.Core;
+using ChronoFlow.API.DAL;
 using ChronoFlow.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,39 +20,93 @@ public class TemplatesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTemplates()
     {
-        var template = new Template();
+        /*var template = new Template();
 
-        await context.EventTemplates.AddAsync(template);
+        await context.Templates.AddAsync(template);
         await context.SaveChangesAsync();
 
-        var template2 = await context.EventTemplates.FirstOrDefaultAsync(e => e.Name == "1");
+        var template2 = await context.Templates.FirstOrDefaultAsync(e => e.Name == "1");
 
         template2.Name = "123123";
 
         await context.SaveChangesAsync();
 
-        var template3 = await context.EventTemplates.AsNoTracking().FirstOrDefaultAsync(e => e.Name == "1");
+        var template3 = await context.Templates.AsNoTracking().FirstOrDefaultAsync(e => e.Name == "1");
         template3.Name = "123";
         await context.SaveChangesAsync();
 
-        context.EventTemplates.Remove(template3);
+        context.Templates.Remove(template3);
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync();*/
 
-        var data = await context.EventTemplates.ToListAsync();
+        var data = await context.Templates.ToListAsync();
+        
+        if (data.Count == 0)
+            return NotFound(data);
 
         return Ok(data);
     }
 
-    [HttpPost]
-    public async Task<Template> CreateTemplate([FromQuery] string template)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetSpecificTemplate([FromRoute] Template template)
     {
-        return new Template();
+        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == template.Id);
+        
+        if (currentTemplate == null)
+            return NotFound();
+        
+        return Ok();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateTemplate([FromRoute] Template template)
+    {
+        await context.Templates.AddAsync(template);
+        await context.SaveChangesAsync();
+
+        return Ok();
     }
 
     [HttpPatch]
-    public async Task<Template> UpdateEvent([FromQuery] string template)
+    public async Task<IActionResult> UpdateTemplate([FromRoute] Template template)
     {
-        return new Template();
+        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        
+        if (templateFromDb == null)
+            return NotFound();
+
+        templateFromDb.Name = template.Name;
+
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteTemplate([FromRoute] Template template)
+    {
+        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        
+        if (templateFromDb == null)
+            return NotFound();
+        
+        context.Templates.Remove(template);
+        await context.SaveChangesAsync();
+        
+        return Ok();
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> ReplaceTemplate([FromRoute] Template template)
+    {
+        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        
+        if (templateFromDb == null)
+            return NotFound();
+        
+        templateFromDb.Id = template.Id;
+        templateFromDb.Name = template.Name;
+        
+        await context.SaveChangesAsync();
+        return Ok();
     }
 }
