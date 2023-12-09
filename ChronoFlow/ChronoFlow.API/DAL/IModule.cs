@@ -1,6 +1,6 @@
 ﻿namespace ChronoFlow.API.DAL;
 
-public class DALMOdule : IModule
+public interface IModule
 {
     
 }

@@ -19,7 +19,7 @@ public class TemplatesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTemplates()
     {
-        var template = new EventTemplate();
+        var template = new Template();
 
         await context.EventTemplates.AddAsync(template);
         await context.SaveChangesAsync();
@@ -44,14 +44,14 @@ public class TemplatesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<EventTemplate> CreateTemplate([FromQuery] string template)
+    public async Task<Template> CreateTemplate([FromQuery] string template)
     {
-        return new EventTemplate();
+        return new Template();
     }
 
     [HttpPatch]
-    public async Task<EventTemplate> UpdateEvent([FromQuery] string template)
+    public async Task<Template> UpdateEvent([FromQuery] string template)
     {
-        return new EventTemplate();
+        return new Template();
     }
 }
