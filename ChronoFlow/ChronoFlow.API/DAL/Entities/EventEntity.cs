@@ -1,6 +1,6 @@
 ﻿namespace ChronoFlow.API.Models;
 
-public class Event
+public class EventEntity : IEntity
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }

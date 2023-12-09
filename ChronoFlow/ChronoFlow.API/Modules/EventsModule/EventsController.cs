@@ -16,8 +16,9 @@ public class EventsController : ControllerBase
         this.context = context;
     }
     
+    // Должно быть в модуле
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Event>>> GetEvents([FromRoute] Event searchReq)
+    public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents([FromRoute] EventEntity searchReq)
     {
         var data = await context.Events.ToListAsync();
 
@@ -25,7 +26,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Event>> GetSpecificEvent([FromRoute] Guid id)
+    public async Task<ActionResult<EventEntity>> GetSpecificEvent([FromRoute] Guid id)
     {
         var currentEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 
@@ -38,7 +39,7 @@ public class EventsController : ControllerBase
     // Желательно писать CreateOrUpdate
     // Или хотя бы не выделять отдельно Patch, а оставлять только POST/PUT
     [HttpPost]
-    public async Task<IActionResult> CreateEvent([FromBody] Event evento)
+    public async Task<IActionResult> CreateEvent([FromBody] EventEntity evento)
     {
         evento.Id = Guid.Empty;
         await context.Events.AddAsync(evento);
@@ -57,7 +58,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpPatch] // лучше было бы [HttpPut]
-    public async Task<IActionResult> UpdateEvent([FromRoute] Event evento)
+    public async Task<IActionResult> UpdateEvent([FromRoute] EventEntity evento)
     {
         var eventFromDb = await context.Events.FindAsync(evento.Id);
 

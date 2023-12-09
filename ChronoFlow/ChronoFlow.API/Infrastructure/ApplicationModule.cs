@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChronoFlow.API.DAL;
 
-public class Module : IModule
+public class ApplicationModule : IModule
 {
     private readonly IConfiguration configuration;
 
-    public Module(IConfiguration configuration)
+    public ApplicationModule(IConfiguration configuration)
     {
         this.configuration = configuration;
     }

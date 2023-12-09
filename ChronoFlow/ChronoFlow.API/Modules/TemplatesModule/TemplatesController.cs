@@ -29,9 +29,9 @@ public class TemplatesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetSpecificTemplate([FromRoute] Template template)
+    public async Task<IActionResult> GetSpecificTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == template.Id);
+        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == templateEntity.Id);
 
         if (currentTemplate == null)
             return NotFound();
@@ -40,52 +40,52 @@ public class TemplatesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateTemplate([FromRoute] Template template)
+    public async Task<IActionResult> CreateTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        await context.Templates.AddAsync(template);
+        await context.Templates.AddAsync(templateEntity);
         await context.SaveChangesAsync();
 
         return Ok();
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateTemplate([FromRoute] Template template)
+    public async Task<IActionResult> UpdateTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
 
         if (templateFromDb == null)
             return NotFound();
 
-        templateFromDb.Name = template.Name;
+        templateFromDb.Name = templateEntity.Name;
 
         await context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteTemplate([FromRoute] Template template)
+    public async Task<IActionResult> DeleteTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
 
         if (templateFromDb == null)
             return NotFound();
 
-        context.Templates.Remove(template);
+        context.Templates.Remove(templateEntity);
         await context.SaveChangesAsync();
 
         return Ok();
     }
 
     [HttpPut]
-    public async Task<IActionResult> ReplaceTemplate([FromRoute] Template template)
+    public async Task<IActionResult> ReplaceTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var templateFromDb = await context.Templates.FindAsync(template.Id);
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
 
         if (templateFromDb == null)
             return NotFound();
 
-        templateFromDb.Id = template.Id;
-        templateFromDb.Name = template.Name;
+        templateFromDb.Id = templateEntity.Id;
+        templateFromDb.Name = templateEntity.Name;
 
         await context.SaveChangesAsync();
         return Ok();
