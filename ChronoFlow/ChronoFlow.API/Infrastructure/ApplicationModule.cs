@@ -1,4 +1,5 @@
 ﻿using ChronoFlow.API.Infra;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChronoFlow.API.DAL;
@@ -12,16 +13,31 @@ public class ApplicationModule : IModule
         this.configuration = configuration;
     }
 
-    public void RegisterModules(IServiceCollection services)
+    public void RegisterModule(IServiceCollection services)
     {
         services.AddSingleton(configuration);
 
         services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("TimeTrackerDB")));
+        
+        var config = new Config(true);
         services.AddSingleton(new Config(true));
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(config.DatabaseConnectionString));
+        /*services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("TimeTrackerDB")));*/
+        
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = (context) =>
+                {
+                    context.Response.StatusCode = 401; // обработать ещё 403 ошибку
+                    return Task.CompletedTask;
+                };
+            });
+        services.AddAuthorization();    
     }
+    
 }

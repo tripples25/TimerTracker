@@ -2,5 +2,5 @@
 
 public interface IModule
 {
-    public IServiceCollection RegisterModule(IServiceCollection services);
+    public void RegisterModule(IServiceCollection services);
 }

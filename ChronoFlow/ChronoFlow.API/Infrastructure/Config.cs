@@ -12,6 +12,9 @@ public class Config
         }
         else
         {
+            
+        }
+        {
             DatabaseConnectionString = Environment.GetEnvironmentVariable("Connection");
         }
     }
