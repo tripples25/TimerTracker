@@ -12,16 +12,13 @@ public class ApplicationModule : IModule
         this.configuration = configuration;
     }
 
-    public void RegisterModules(IServiceCollection services)
+    public IServiceCollection RegisterModule(IServiceCollection services)
     {
-        services.AddSingleton(configuration);
-
         services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("TimeTrackerDB")));
+        services.AddSingleton(configuration);
         services.AddSingleton(new Config(true));
+        services.AddDbContext<ApplicationDbContext>();
+
+        return services;
     }
 }

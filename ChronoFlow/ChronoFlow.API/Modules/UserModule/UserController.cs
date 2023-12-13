@@ -18,10 +18,12 @@ namespace ChronoFlow.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext context;
+        private readonly PasswordHasher passwordHasher;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context, PasswordHasher passwordHashers)
         {
             this.context = context;
+            this.passwordHasher = passwordHashers;
         }
 
         [HttpPost("register")]
@@ -32,7 +34,7 @@ namespace ChronoFlow.API.Controllers
                 return BadRequest("User already exists.");
             }
 
-            var passwordHash = PasswordHasher.CreatePasswordHash(request.Password, Config.passwordSalt);
+            var passwordHash = passwordHasher.CreatePasswordHash(request.Password);
 
             var user = new UserEntity
             {
@@ -43,7 +45,7 @@ namespace ChronoFlow.API.Controllers
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
 
-            return Ok("User successfully created!");
+            return NoContent();
         }
 
         [HttpPost("login")]
@@ -51,14 +53,13 @@ namespace ChronoFlow.API.Controllers
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email); 
 
-            if (user is null)
-            {
-                return BadRequest("User not found.");
-            }
-            if (!PasswordHasher.VerifyPasswordHash(request.Password, user.PasswordHash, Config.passwordSalt)) // Секрет на Соль можно держать в Config
-            {
+            if (user == null)
+                return NotFound();
+            
+            // Секрет на Соль можно держать в Config
+            if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash)) 
                 return BadRequest("Password is incorrect.");
-            }
+            
             var claims = new List<Claim>
             {
                 new(type: ClaimTypes.Email, value: request.Email),
@@ -74,6 +75,7 @@ namespace ChronoFlow.API.Controllers
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10), // Потестить что через 10 минут можно всё ещё ходить под
                                                                        // залогиненым пользователем(токен не протух и обновился сам)
                 });
+            
             return Ok(user.Id);
         }
 
@@ -91,17 +93,13 @@ namespace ChronoFlow.API.Controllers
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            if (!PasswordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, Config.passwordSalt))
-            {
+            if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
                 return BadRequest("Password is incorrect.");
-            }
 
-            user.PasswordHash = PasswordHasher.CreatePasswordHash(request.NewPassword, Config.passwordSalt);
+            user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword);
             await context.SaveChangesAsync();
+            
             return Ok("Password successfully changed!");
         }
-
-        // Создать класс который считает хеш, не забыть добаить его в DI
-
     }
 }
