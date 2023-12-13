@@ -1,4 +1,4 @@
-﻿namespace ChronoFlow.API.Infra;
+﻿namespace ChronoFlow.API.Infrastructure;
 
 public class Config
 {
@@ -11,9 +11,6 @@ public class Config
             DatabaseConnectionString = "Server=localhost;Database=TimeTrackerDB;Port=5432;User Id=postgres;Password=1";
         }
         else
-        {
-            
-        }
         {
             DatabaseConnectionString = Environment.GetEnvironmentVariable("Connection");
         }

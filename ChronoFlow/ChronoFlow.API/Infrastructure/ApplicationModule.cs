@@ -1,8 +1,8 @@
-﻿using ChronoFlow.API.Infra;
+﻿using ChronoFlow.API.DAL;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.DAL;
+namespace ChronoFlow.API.Infrastructure;
 
 public class ApplicationModule : IModule
 {

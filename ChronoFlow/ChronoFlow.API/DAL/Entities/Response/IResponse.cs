@@ -1,4 +1,4 @@
-﻿namespace ChronoFlow.API.Models;
+﻿namespace ChronoFlow.API.DAL.Entities.Response;
 
 public interface IResponse
 {

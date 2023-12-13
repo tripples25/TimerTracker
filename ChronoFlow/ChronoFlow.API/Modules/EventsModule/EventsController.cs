@@ -1,9 +1,10 @@
 ﻿using ChronoFlow.API.DAL;
-using ChronoFlow.API.Models;
+using ChronoFlow.API.DAL.Entities;
+using ChronoFlow.API.DAL.Entities.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.Controllers;
+namespace ChronoFlow.API.Modules.EventsModule;
 
 [ApiController]
 [Route("api/[controller]")]
