@@ -8,6 +8,8 @@ using ChronoFlow.API.Modules.UserModule;
 using System.Security.Cryptography;
 using ChronoFlow.API.DAL;
 using Microsoft.EntityFrameworkCore;
+using ChronoFlow.API.Infra;
+using ChronoFlow.API.Models;
 
 namespace ChronoFlow.API.Controllers
 {
@@ -30,11 +32,9 @@ namespace ChronoFlow.API.Controllers
                 return BadRequest("User already exists.");
             }
 
-            CreatePasswordHash(request.Password,
-                out byte[] passwordHash,
-                out byte[] passwordSalt);
+            var passwordHash = PasswordHasher.CreatePasswordHash(request.Password, Config.passwordSalt);
 
-            var user = new User
+            var user = new UserEntity
             {
                 Name = request.Name,
                 Email =  request.Email,
@@ -55,14 +55,13 @@ namespace ChronoFlow.API.Controllers
             {
                 return BadRequest("User not found.");
             }
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, /*passwordSalt*/)) // Секрет на Соль можно держать в Config
+            if (!PasswordHasher.VerifyPasswordHash(request.Password, user.PasswordHash, Config.passwordSalt)) // Секрет на Соль можно держать в Config
             {
                 return BadRequest("Password is incorrect.");
             }
             var claims = new List<Claim>
             {
                 new(type: ClaimTypes.Email, value: request.Email),
-                new(type: ClaimTypes.Name,value: user.Name) //  Нет нужды хранить два идентификатора, тк у ниходна и та же цель(лишняя инфа)
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(
@@ -92,34 +91,17 @@ namespace ChronoFlow.API.Controllers
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            if (!VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
+            if (!PasswordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, Config.passwordSalt))
             {
                 return BadRequest("Password is incorrect.");
             }
 
-            CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
-            user.PasswordHash = passwordHash;
+            user.PasswordHash = PasswordHasher.CreatePasswordHash(request.NewPassword, Config.passwordSalt);
             await context.SaveChangesAsync();
             return Ok("Password successfully changed!");
         }
 
-        // out - bad prectice. Лучше использовать хотя бы кортежи(возвращать значение лучше чем out)
         // Создать класс который считает хеш, не забыть добаить его в DI
-        private (byte[] passwordHash, byte[] passwordSalt) CreatePasswordHash(
-            string password, 
-            byte[] passwordHash,
-            byte[] passwordSalt)
-        {
-            using var hmac = new HMACSHA512();
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-        }
 
-        private bool VerifyPasswordHash(string password, string passwordHash)
-        {
-            using var hmac = new HMACSHA512();
-            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            return computedHash.SequenceEqual(passwordHash);
-        }
     }
 }

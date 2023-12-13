@@ -7,17 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 var module = new ApplicationModule(builder.Configuration);
 module.RegisterModules(builder.Services);
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Events.OnRedirectToLogin = (context) =>
-        {
-            context.Response.StatusCode = 401; // обработать ещё 403 ошибку
-            return Task.CompletedTask;
-        };
-    });
-builder.Services.AddAuthorization();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
