@@ -1,4 +1,4 @@
-﻿namespace ChronoFlow.API.Infrastructure;
+﻿namespace ChronoFlow.API.DAL;
 
 public interface IModule
 {

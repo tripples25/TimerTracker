@@ -1,5 +1,5 @@
-﻿using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.Infrastructure;
+﻿using ChronoFlow.API.Infra;
+using ChronoFlow.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChronoFlow.API.DAL;

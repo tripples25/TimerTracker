@@ -1,4 +1,4 @@
-﻿namespace ChronoFlow.API.DAL.Entities;
+﻿namespace ChronoFlow.API.Models;
 
 public class UserEntity
 {

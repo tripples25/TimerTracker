@@ -1,8 +1,7 @@
-﻿using ChronoFlow.API.DAL;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using ChronoFlow.API.Infra;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.Infrastructure;
+namespace ChronoFlow.API.DAL;
 
 public class ApplicationModule : IModule
 {
@@ -22,5 +21,4 @@ public class ApplicationModule : IModule
 
         return services;
     }
-    
 }

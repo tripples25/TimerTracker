@@ -1,10 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ChronoFlow.API.Models;
 
-namespace ChronoFlow.API.DAL.Entities;
-
-public class TemplateEntity : IEntity
+public class TemplateEntity
 {
-    [Key]
     public Guid Id { get; set; }
     public string Name { get; set; }
 }

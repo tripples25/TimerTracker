@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using ChronoFlow.API.DAL;
 using ChronoFlow.API.Infra;
 

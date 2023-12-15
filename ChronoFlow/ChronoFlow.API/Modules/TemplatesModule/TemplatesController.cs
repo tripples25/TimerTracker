@@ -1,10 +1,9 @@
 ﻿using ChronoFlow.API.DAL;
-using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.DAL.Entities.Response;
+using ChronoFlow.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.Modules.TemplatesModule;
+namespace ChronoFlow.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,63 +15,79 @@ public class TemplatesController : ControllerBase
     {
         this.context = context;
     }
-    
+
+    // Смотри EventsController
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TemplateEntity>>> GetTemplates()
+    public async Task<IActionResult> GetTemplates() // Типизорвать ActionResult<Ответ>
     {
         var data = await context.Templates.ToListAsync();
+
+        if (data.Count == 0)
+            return NotFound(data); // Не должно быть ошибки. Пустой лист после поиска - Валидное поведение
 
         return Ok(data);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<TemplateEntity>> GetTemplateAsync([FromRoute] Guid id)
+    public async Task<IActionResult> GetSpecificTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == id);
+        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == templateEntity.Id);
 
-        if (currentTemplate is null)
+        if (currentTemplate == null)
             return NotFound();
 
         return Ok();
     }
 
     [HttpPost]
-    public async Task<ActionResult<TemplateEntity>> CreateOrUpdateTemplate([FromBody] TemplateEntity templateEntity)
+    public async Task<IActionResult> CreateTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var dbTemplate = await context.Templates.FindAsync(templateEntity.Id);
-        var isCreated = false;
-
-        if (dbTemplate is null)
-        {
-            templateEntity.Id = Guid.Empty;
-            templateEntity.Name = "";
-            isCreated = true;
-            await context.AddAsync(templateEntity);
-        }
-        else
-        {
-            dbTemplate.Name = templateEntity.Name;
-        }
-
+        await context.Templates.AddAsync(templateEntity);
         await context.SaveChangesAsync();
 
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = templateEntity.Id,
-            IsCreated = isCreated,
-        });
+        return Ok();
     }
 
-    [HttpDelete("{id:Guid}")]
-    public async Task<ActionResult<TemplateEntity>> DeleteTemplate([FromRoute] Guid id)
+    [HttpPatch]
+    public async Task<IActionResult> UpdateTemplate([FromRoute] TemplateEntity templateEntity)
     {
-        var dbTemplate = await context.Templates.FindAsync(id);
-        if (dbTemplate != null)
-        {
-            context.Templates.Remove(dbTemplate);
-            await context.SaveChangesAsync();
-        }
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
 
-        return NoContent();
+        if (templateFromDb == null)
+            return NotFound();
+
+        templateFromDb.Name = templateEntity.Name;
+
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteTemplate([FromRoute] TemplateEntity templateEntity)
+    {
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
+
+        if (templateFromDb == null)
+            return NotFound();
+
+        context.Templates.Remove(templateEntity);
+        await context.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> ReplaceTemplate([FromRoute] TemplateEntity templateEntity)
+    {
+        var templateFromDb = await context.Templates.FindAsync(templateEntity.Id);
+
+        if (templateFromDb == null)
+            return NotFound();
+
+        templateFromDb.Id = templateEntity.Id;
+        templateFromDb.Name = templateEntity.Name;
+
+        await context.SaveChangesAsync();
+        return Ok();
     }
 }

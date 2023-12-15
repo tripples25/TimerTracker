@@ -1,10 +1,9 @@
 ﻿using ChronoFlow.API.DAL;
-using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.DAL.Entities.Response;
+using ChronoFlow.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.Modules.EventsModule;
+namespace ChronoFlow.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,15 +15,12 @@ public class EventsController : ControllerBase
     {
         this.context = context;
     }
-
+    
     // Должно быть в модуле
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
+    public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents([FromRoute] EventEntity searchReq)
     {
         var data = await context.Events.ToListAsync();
-        
-        if (data.Count == 0)
-            return NotFound(data);
 
         return Ok(data);
     }
@@ -34,7 +30,7 @@ public class EventsController : ControllerBase
     {
         var currentEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 
-        if (currentEvent is null)
+        if (currentEvent == null)
             return NotFound();
 
         return Ok(currentEvent);
@@ -43,49 +39,48 @@ public class EventsController : ControllerBase
     // Желательно писать CreateOrUpdate
     // Или хотя бы не выделять отдельно Patch, а оставлять только POST/PUT
     [HttpPost]
-    public async Task<ActionResult<EventEntity>> CreateOrUpdateEvent([FromBody] EventEntity eventEntity)
+    public async Task<IActionResult> CreateEvent([FromBody] EventEntity evento)
     {
-        var dbEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == eventEntity.Id);
-
-        if (dbEvent is null)
-        {
-            eventEntity.Id = Guid.Empty;
-            eventEntity.StartTime = new DateTime();
-            eventEntity.EndTime = new DateTime();
-
-            await context.Events.AddAsync(eventEntity);
-            await context.SaveChangesAsync();
-
-            return Ok(new CreateOrUpdateResponse
-            {
-                Id = eventEntity.Id,
-                IsCreated = true
-            });
-        }
-
-        dbEvent.Id = eventEntity.Id;
-        dbEvent.StartTime = eventEntity.StartTime;
-        dbEvent.EndTime = eventEntity.EndTime;
-
-        await context.Events.AddAsync(dbEvent);
+        evento.Id = Guid.Empty;
+        await context.Events.AddAsync(evento);
         await context.SaveChangesAsync();
 
-        return Ok(new CreateOrUpdateResponse
+        return Ok(new CreatedOrUpdateResponse
         {
-            Id = eventEntity.Id,
-            IsCreated = false
+            Id = evento.Id,
         });
     }
 
-    [HttpDelete("{id:Guid}")]
-    public async Task<ActionResult<EventEntity>> DeleteEvent([FromBody] Guid id)
+    public class CreatedOrUpdateResponse
     {
-        var dbEvent = await context.Events.FindAsync(id);
+        public Guid Id { get; set; }
+        public bool IsCreated { get; set; }
+    }
 
-        if (dbEvent == null)
+    [HttpPatch] // лучше было бы [HttpPut]
+    public async Task<IActionResult> UpdateEvent([FromRoute] EventEntity evento)
+    {
+        var eventFromDb = await context.Events.FindAsync(evento.Id);
+
+        if (eventFromDb == null)
             return NotFound();
 
-        context.Events.Remove(dbEvent);
+        eventFromDb.StartTime = evento.StartTime;
+        eventFromDb.EndTime = evento.EndTime;
+
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteEvent([FromRoute] Guid id)
+    {
+        var eventFromDb = await context.Events.FindAsync(id);
+
+        if (eventFromDb == null)
+            return NotFound();
+
+        context.Events.Remove(eventFromDb);
         await context.SaveChangesAsync();
 
         return NoContent();

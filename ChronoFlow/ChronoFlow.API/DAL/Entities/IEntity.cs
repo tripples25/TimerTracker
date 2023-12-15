@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChronoFlow.API.DAL.Entities;
+namespace ChronoFlow.API.Models;
 
 public interface IEntity
 {
