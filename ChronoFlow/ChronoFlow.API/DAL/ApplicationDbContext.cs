@@ -6,7 +6,7 @@ namespace ChronoFlow.API.DAL;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<UserEntity> Users { get; set; }
+    public DbSet<UserEntity> Users { get; set; } //юзер
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<TemplateEntity> Templates { get; set; }
 
