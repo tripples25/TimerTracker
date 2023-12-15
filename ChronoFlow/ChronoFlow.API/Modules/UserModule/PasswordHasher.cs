@@ -16,7 +16,7 @@ public class PasswordHasher
 
     public string CreatePasswordHash(string password)
     {
-        using var hmac = new HMACSHA512();
+        using var hmac = new HMACSHA512(); //test
         hmac.Key = passwordSalt;
         byte[] passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         return Convert.ToBase64String(passwordHash);
