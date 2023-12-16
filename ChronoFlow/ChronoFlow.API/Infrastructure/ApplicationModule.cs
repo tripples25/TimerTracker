@@ -12,8 +12,18 @@ public class ApplicationModule : IModule
     {
         this.configuration = configuration;
     }
+    
+    public IServiceCollection RegisterModule(IServiceCollection services)
+    {
+        services.AddControllers();
+        services.AddSingleton(configuration);
+        services.AddSingleton(new Config(true));
+        services.AddDbContext<ApplicationDbContext>();
 
-    public void RegisterModule(IServiceCollection services)
+        return services;
+    }
+
+    /*public void RegisterModule(IServiceCollection services)
     {
         services.AddSingleton(configuration);
 
@@ -26,7 +36,7 @@ public class ApplicationModule : IModule
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(config.DatabaseConnectionString));
         /*services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("TimeTrackerDB")));*/
+            options.UseNpgsql(configuration.GetConnectionString("TimeTrackerDB")));#1#
         
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
@@ -38,6 +48,6 @@ public class ApplicationModule : IModule
                 };
             });
         services.AddAuthorization();    
-    }
+    }*/
     
 }
