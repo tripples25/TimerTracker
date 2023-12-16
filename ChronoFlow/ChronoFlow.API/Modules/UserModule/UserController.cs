@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using ChronoFlow.API.DAL;
 using Microsoft.EntityFrameworkCore;
 using ChronoFlow.API.DAL.Entities;
+using System.Security.Cryptography;
 
 namespace ChronoFlow.API.Modules.UserModule
 {
@@ -29,15 +30,17 @@ namespace ChronoFlow.API.Modules.UserModule
             {
                 return BadRequest("User already exists.");
             }
-
-            var passwordHash = passwordHasher.CreatePasswordHash(request.Password);
+            var passwordSalt = new HMACSHA512().Key;
+            var passwordHash = passwordHasher.CreatePasswordHash(request.Password, passwordSalt);
 
             var user = new UserEntity
             {
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
             };
+        
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
 
@@ -48,12 +51,11 @@ namespace ChronoFlow.API.Modules.UserModule
         public async Task<IActionResult> Login([FromBody] UserLogInRequest request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
             if (user == null)
                 return NotFound();
 
             // Секрет на Соль можно держать в Config
-            if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash))
+            if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 return BadRequest("Password is incorrect.");
 
             var claims = new List<Claim>
@@ -88,11 +90,10 @@ namespace ChronoFlow.API.Modules.UserModule
         public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            Console.WriteLine(user);
-            if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
+            if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
                 return BadRequest("Password is incorrect.");
 
-            user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword);
+            user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword, user.PasswordSalt);
             await context.SaveChangesAsync();
 
             return Ok("Password successfully changed!");
