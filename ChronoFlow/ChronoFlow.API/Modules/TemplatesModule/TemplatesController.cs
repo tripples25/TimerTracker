@@ -26,7 +26,7 @@ public class TemplatesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<TemplateEntity>> GetTemplateAsync([FromRoute] Guid id)
+    public async Task<ActionResult<TemplateEntity>> GetTemplate([FromRoute] Guid id)
     {
         var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == id);
 
@@ -45,7 +45,7 @@ public class TemplatesController : ControllerBase
         if (dbTemplate is null)
         {
             templateEntity.Id = Guid.Empty;
-            templateEntity.Name = "";
+            templateEntity.Name = string.Empty;
             isCreated = true;
             await context.AddAsync(templateEntity);
         }
@@ -67,6 +67,7 @@ public class TemplatesController : ControllerBase
     public async Task<ActionResult<TemplateEntity>> DeleteTemplate([FromRoute] Guid id)
     {
         var dbTemplate = await context.Templates.FindAsync(id);
+        
         if (dbTemplate != null)
         {
             context.Templates.Remove(dbTemplate);

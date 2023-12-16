@@ -15,7 +15,7 @@ public class ApplicationModule : IModule
     public ApplicationModule()
     {
     }
-    
+
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
         services.AddControllers();

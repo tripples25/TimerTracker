@@ -7,7 +7,6 @@ namespace ChronoFlow.API.Infrastructure
     {
         public void ConfigureHubs(WebApplication app)
         {
-            
         }
 
         public IServiceCollection RegisterModule(IServiceCollection services)

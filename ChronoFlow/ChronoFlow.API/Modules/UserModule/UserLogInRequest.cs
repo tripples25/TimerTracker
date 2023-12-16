@@ -10,5 +10,4 @@ namespace ChronoFlow.API.Modules.UserModule
         [Required, MinLength(6, ErrorMessage = "Длина пароля минимум 6 символов")]
         public string Password { get; set; } = string.Empty;
     }
-
 }

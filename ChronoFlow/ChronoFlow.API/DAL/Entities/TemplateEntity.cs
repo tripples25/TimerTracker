@@ -4,7 +4,7 @@ namespace ChronoFlow.API.DAL.Entities;
 
 public class TemplateEntity : IEntity
 {
-    [Key]
+    [Key] 
     public Guid Id { get; set; }
     public string Name { get; set; }
 }

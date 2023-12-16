@@ -3,8 +3,8 @@
 namespace ChronoFlow.API.Modules.UserModule
 {
     public class UserRegisterRequest
-    {   
-        [Required, MinLength(4), MaxLength(16)] 
+    {
+        [Required, MinLength(4), MaxLength(16)]
         public string Name { get; set; } = string.Empty;
 
         [Required, EmailAddress]
