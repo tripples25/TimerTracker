@@ -24,13 +24,4 @@ public class ApplicationDbContext : DbContext
             builder => { builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); });
         base.OnConfiguring(optionsBuilder);
     }
-
-    public class ApplicationDbContextFactory : IDbContextFactory<ApplicationDbContext>
-    {
-        public ApplicationDbContext CreateDbContext()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            return new ApplicationDbContext(optionsBuilder.Options, new Config(true));
-        }
-    }
 }

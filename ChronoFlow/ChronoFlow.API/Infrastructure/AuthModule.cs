@@ -5,11 +5,6 @@ namespace ChronoFlow.API.Infrastructure
 {
     public class AuthModule : IModule
     {
-        public void ConfigureHubs(WebApplication app)
-        {
-            
-        }
-
         public IServiceCollection RegisterModule(IServiceCollection services)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -28,7 +23,6 @@ namespace ChronoFlow.API.Infrastructure
                 };
             });
             services.AddAuthorization();
-            services.AddScoped<PasswordHasher>();
             return services;
         }
     }
