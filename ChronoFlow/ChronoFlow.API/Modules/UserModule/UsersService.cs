@@ -14,20 +14,20 @@ public interface IUsersService
 
 public class UsersService : ControllerBase, IUsersService
 {
-    private readonly ApplicationDbContext context;
+    private readonly IUsersRepository usersRepository;
     private readonly PasswordHasher passwordHasher;
 
     public UsersService(
-        ApplicationDbContext context,
+        IUsersRepository usersRepository,
         PasswordHasher passwordHasher)
     {
-        this.context = context;
+        this.usersRepository = usersRepository;
         this.passwordHasher = passwordHasher;
     }
 
     public async Task<ActionResult<Guid>> Login(UserLogInRequest request)
     {
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var user = await usersRepository.FindAsync(request.Email);
         if (user == null)
             return NotFound();
 
