@@ -45,8 +45,8 @@ public class EventsController : ControllerBase
         if (dbEvent is null)
         {
             eventEntity.Id = Guid.Empty;
-            eventEntity.StartTime = new DateTime();
-            eventEntity.EndTime = new DateTime();
+            eventEntity.StartTime = eventEntity.StartTime;
+            eventEntity.EndTime = eventEntity.EndTime;
             isCreated = true;
 
             await context.Events.AddAsync(eventEntity);
@@ -67,7 +67,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
-    public async Task<ActionResult<EventEntity>> DeleteEvent([FromBody] Guid id)
+    public async Task<ActionResult> DeleteEvent([FromBody] Guid id)
     {
         var dbEvent = await context.Events.FindAsync(id);
 
