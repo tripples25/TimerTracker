@@ -26,6 +26,9 @@ public class EventsController : ControllerBase
         if (data.Count == 0)
             return NotFound(data);
 
+        if (data.Count == 0)
+            return NotFound(data);
+
         return Ok(data);
     }
 

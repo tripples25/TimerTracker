@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using ChronoFlow.API.Modules.UserModule;
 
 namespace ChronoFlow.API.Infrastructure
 {
@@ -27,6 +28,7 @@ namespace ChronoFlow.API.Infrastructure
                     };
                 });
             services.AddAuthorization();
+            services.AddScoped<PasswordHasher>();
             return services;
         }
     }

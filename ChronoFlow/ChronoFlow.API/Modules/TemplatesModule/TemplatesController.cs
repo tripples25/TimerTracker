@@ -16,7 +16,7 @@ public class TemplatesController : ControllerBase
     {
         this.context = context;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TemplateEntity>>> GetTemplates()
     {

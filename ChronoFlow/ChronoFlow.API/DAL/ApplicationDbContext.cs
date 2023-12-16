@@ -6,7 +6,7 @@ namespace ChronoFlow.API.DAL;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<UserEntity> Users { get; set; } //юзер
+    public DbSet<UserEntity> Users { get; set; }
     public DbSet<EventEntity> Events { get; set; }
     public DbSet<TemplateEntity> Templates { get; set; }
     private readonly Config config;
@@ -22,5 +22,14 @@ public class ApplicationDbContext : DbContext
         optionsBuilder.UseNpgsql(config.DatabaseConnectionString,
             builder => { builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); });
         base.OnConfiguring(optionsBuilder);
+    }
+
+    public class ApplicationDbContextFactory : IDbContextFactory<ApplicationDbContext>
+    {
+        public ApplicationDbContext CreateDbContext()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            return new ApplicationDbContext(optionsBuilder.Options, new Config(true));
+        }
     }
 }
