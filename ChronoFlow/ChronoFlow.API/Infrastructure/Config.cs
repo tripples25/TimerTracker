@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace ChronoFlow.API.Infra;
+namespace ChronoFlow.API.Infrastructure;
 
 public class Config
 {

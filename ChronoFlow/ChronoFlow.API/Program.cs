@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using ChronoFlow.API.DAL;
-using ChronoFlow.API.Infra;
+using ChronoFlow.API.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

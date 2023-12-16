@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-using ChronoFlow.API.Infra;
+using ChronoFlow.API.Infrastructure;
 
 namespace ChronoFlow.API.Modules.UserModule;
 

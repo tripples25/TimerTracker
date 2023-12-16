@@ -1,22 +1,26 @@
-﻿using ChronoFlow.API.Infra;
+﻿using ChronoFlow.API.DAL;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChronoFlow.API.DAL;
+namespace ChronoFlow.API.Infrastructure;
 
 public class ApplicationModule : IModule
 {
-    private readonly IConfiguration configuration;
+    //private readonly IConfiguration configuration;
 
-    public ApplicationModule(IConfiguration configuration)
+    //public ApplicationModule(IConfiguration configuration)
+    //{
+    //    this.configuration = configuration;
+    //}
+
+
+    public ApplicationModule()
     {
-        this.configuration = configuration;
     }
 
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
         services.AddControllers();
-        services.AddSingleton(configuration);
-        services.AddSingleton(new Config(true));
+        //services.AddSingleton(configuration);
         services.AddDbContext<ApplicationDbContext>();
 
         return services;
