@@ -7,8 +7,8 @@ public class UsersModule : IModule
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
         services.AddSingleton<PasswordHasher>();
-        services.AddScoped<IUsersService, UsersService>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUsersRepository, UserRepository>();
         
         return services;
     }

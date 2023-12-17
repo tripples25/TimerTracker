@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using ChronoFlow.API.Modules.UserModule;
 
 namespace ChronoFlow.API.Infrastructure
 {

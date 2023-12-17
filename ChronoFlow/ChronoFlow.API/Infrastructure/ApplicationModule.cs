@@ -1,17 +1,20 @@
 ﻿using ChronoFlow.API.DAL;
+using ChronoFlow.API.Modules.EventsModule;
+using ChronoFlow.API.Modules.TemplatesModule;
+using ChronoFlow.API.Modules.UserModule;
 
 namespace ChronoFlow.API.Infrastructure;
 
 public class ApplicationModule : IModule
 {
-    public ApplicationModule()
-    {
-    }
-
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
         services.AddControllers();
         //services.AddSingleton(configuration);
+        services.AddScoped<ITemplateService, TemplateService>();
+        services.AddScoped<IEventService, EventService>();
+        services.AddScoped<IUserService, UserService>();
+
         services.AddDbContext<ApplicationDbContext>();
 
         return services;

@@ -18,7 +18,7 @@ public class PasswordHasher
     {
         using var hmac = new HMACSHA512();
         hmac.Key = config.PasswordSalt;
-        byte[] passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        byte[] passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         
         return Convert.ToBase64String(passwordHash);
     }
@@ -27,7 +27,7 @@ public class PasswordHasher
     {
         var passwordHashInBytes = Convert.FromBase64String(passwordHash);
         using var hmac = new HMACSHA512(config.PasswordSalt);
-        var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         
         return computedHash.SequenceEqual(passwordHashInBytes);
     }
