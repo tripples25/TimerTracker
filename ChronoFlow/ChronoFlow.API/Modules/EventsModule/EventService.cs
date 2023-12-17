@@ -8,23 +8,23 @@ namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
 {
-    private readonly ApplicationDbContext context;
+    private readonly IEventRepository eventRepository;
 
-    public EventService(ApplicationDbContext context)
+    public EventService( IEventRepository eventRepository)
     {
-        this.context = context;
+        this.eventRepository = eventRepository;
     }
     
     public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
     {
-        var data = await context.Events.ToListAsync();
+        var data = await eventRepository.ToListAsync();
 
         return Ok(data);
     }
 
     public async Task<ActionResult<EventEntity>> GetEvent(Guid id)
     {
-        var currentEvent = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
+        var currentEvent = await eventRepository.FirstOrDefaultAsync(id);
 
         if (currentEvent is null)
             return NotFound("The event does not exist");
@@ -34,7 +34,7 @@ public class EventService : ControllerBase, IEventService
 
     public async Task<ActionResult<EventEntity>> CreateOrUpdateEvent(EventEntity eventEntity)
     {
-        var dbEvent = await context.Events.FindAsync(eventEntity.Id);
+        var dbEvent = await eventRepository.FindAsync(eventEntity.Id);
         var isCreated = false;
 
         if (dbEvent is null)
@@ -44,7 +44,7 @@ public class EventService : ControllerBase, IEventService
             eventEntity.EndTime = eventEntity.EndTime;
             isCreated = true;
 
-            await context.Events.AddAsync(eventEntity);
+            await eventRepository.AddAsync(eventEntity);
         }
         else
         {
@@ -52,7 +52,7 @@ public class EventService : ControllerBase, IEventService
             dbEvent.EndTime = eventEntity.EndTime;
         }
 
-        await context.SaveChangesAsync();
+        await eventRepository.SaveChangesAsync();
         
         return Ok(new CreateOrUpdateResponse
         {
@@ -63,12 +63,12 @@ public class EventService : ControllerBase, IEventService
 
     public async Task<ActionResult> DeleteEvent(Guid id)
     {
-        var dbEvent = await context.Events.FindAsync(id);
+        var dbEvent = await eventRepository.FindAsync(id);
 
         if (dbEvent != null)
         {
-            context.Events.Remove(dbEvent);
-            await context.SaveChangesAsync();
+            eventRepository.Remove(dbEvent);
+            await eventRepository.SaveChangesAsync();
         }
         
         return NoContent();

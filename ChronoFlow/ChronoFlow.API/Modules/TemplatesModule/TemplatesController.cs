@@ -27,6 +27,6 @@ public class TemplatesController : ControllerBase
         => service.CreateOrUpdateTemplate(templateEntity);
 
     [HttpDelete("{id:Guid}")]
-    public Task<ActionResult<TemplateEntity>> DeleteTemplate([FromRoute] Guid id)
+    public Task<ActionResult> DeleteTemplate([FromRoute] Guid id)
         => service.DeleteTemplate(id);
 }

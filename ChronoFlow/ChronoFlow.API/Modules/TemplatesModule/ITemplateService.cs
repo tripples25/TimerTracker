@@ -8,5 +8,5 @@ public interface ITemplateService
     Task<ActionResult<IEnumerable<TemplateEntity>>> GetTemplates();
     Task<ActionResult<TemplateEntity>> GetTemplate(Guid id);
     Task<ActionResult<TemplateEntity>> CreateOrUpdateTemplate(TemplateEntity templateEntity);
-    Task<ActionResult<TemplateEntity>> DeleteTemplate(Guid id);
+    Task<ActionResult> DeleteTemplate(Guid id);
 }

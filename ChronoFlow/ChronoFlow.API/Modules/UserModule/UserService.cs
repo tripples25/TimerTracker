@@ -11,20 +11,18 @@ namespace ChronoFlow.API.Modules.UserModule;
 
 public class UserService : ControllerBase, IUserService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IUsersRepository usersRepository;
+    private readonly IUserRepository userRepository;
     private readonly PasswordHasher passwordHasher;
 
-    public UserService(IUsersRepository usersRepository,ApplicationDbContext context, PasswordHasher passwordHasher)
+    public UserService(IUserRepository userRepository, PasswordHasher passwordHasher)
     {
-        this.usersRepository = usersRepository;
-        this.context = context;
+        this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
     }
 
     public async Task<IActionResult> Register(UserRegisterRequest request)
     {
-        if (context.Users.Any(u => u.Email == request.Email))
+        if (userRepository.Any(request.Email))
         {
             return BadRequest("User already exists.");
         }
@@ -39,16 +37,15 @@ public class UserService : ControllerBase, IUserService
             PasswordSalt = passwordSalt
         };
         
-        await context.Users.AddAsync(user);
-        await context.SaveChangesAsync();
+        await userRepository.AddAsync(user);
+        await userRepository.SaveChangesAsync();
 
         return NoContent();
     }
 
     public async Task<ActionResult<Guid>> Login(UserLogInRequest request)
     {
-        //var user = await usersRepository.FindAsync(request.Email);
-        var user = await usersRepository.FindAsync(request.Email);
+        var user = await userRepository.FindAsync(request.Email);
         if (user == null)
             return NotFound();
 
@@ -71,8 +68,7 @@ public class UserService : ControllerBase, IUserService
                 ExpiresUtc = DateTimeOffset.UtcNow.AddDays(100), // Потестить что через 10 минут можно всё ещё ходить под
                 // залогиненым пользователем(токен не протух и обновился сам)
             });
-
-        //return Ok(user.Id);
+        
         return Ok(user.Email);
     }
 
@@ -84,12 +80,13 @@ public class UserService : ControllerBase, IUserService
 
     public async Task<ActionResult> ChangePassword(UserChangePasswordRequest request)
     {
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var user = await userRepository.FirstOrDefaultAsync(request.Email);
         if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
             return BadRequest("Password is incorrect.");
 
         user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword, user.PasswordSalt);
-        await context.SaveChangesAsync();
+        await userRepository.SaveChangesAsync();
+        await userRepository.SaveChangesAsync();
 
         return NoContent();
     }

@@ -2,13 +2,13 @@
 
 namespace ChronoFlow.API.Modules.UserModule;
 
-public class UsersModule : IModule
+public class UserModule : IModule
 {
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
         services.AddSingleton<PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IUsersRepository, UserRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         
         return services;
     }

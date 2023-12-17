@@ -8,24 +8,24 @@ namespace ChronoFlow.API.Modules.TemplatesModule;
 
 public class TemplateService : ControllerBase, ITemplateService
 {
-    private readonly ApplicationDbContext context;
+    private readonly ITemplateRepository templateRepository;
 
-    public TemplateService(ApplicationDbContext context)
+    public TemplateService(ITemplateRepository templateRepository)
     {
-        this.context = context;
+        this.templateRepository = templateRepository;
     }
 
 
     public async Task<ActionResult<IEnumerable<TemplateEntity>>> GetTemplates()
     {
-        var data = await context.Templates.ToListAsync();
+        var data = await templateRepository.ToListAsync();
 
         return Ok(data);
     }
 
     public async Task<ActionResult<TemplateEntity>> GetTemplate(Guid id)
     {
-        var currentTemplate = await context.Templates.FirstOrDefaultAsync(t => t.Id == id);
+        var currentTemplate = await templateRepository.FirstOrDefaultAsync(id);
 
         if (currentTemplate is null)
             return NotFound("The template does not exist");
@@ -35,7 +35,7 @@ public class TemplateService : ControllerBase, ITemplateService
 
     public async Task<ActionResult<TemplateEntity>> CreateOrUpdateTemplate(TemplateEntity templateEntity)
     {
-        var dbTemplate = await context.Templates.FindAsync(templateEntity.Id);
+        var dbTemplate = await templateRepository.FindAsync(templateEntity.Id);
         var isCreated = false;
 
         if (dbTemplate is null)
@@ -43,14 +43,14 @@ public class TemplateService : ControllerBase, ITemplateService
             templateEntity.Id = Guid.Empty;
             templateEntity.Name = string.Empty;
             isCreated = true;
-            await context.AddAsync(templateEntity);
+            await templateRepository.AddAsync(templateEntity);
         }
         else
         {
             dbTemplate.Name = templateEntity.Name;
         }
 
-        await context.SaveChangesAsync();
+        await templateRepository.SaveChangesAsync();
 
         return Ok(new CreateOrUpdateResponse
         {
@@ -59,14 +59,14 @@ public class TemplateService : ControllerBase, ITemplateService
         });
     }
 
-    public async Task<ActionResult<TemplateEntity>> DeleteTemplate(Guid id)
+    public async Task<ActionResult> DeleteTemplate(Guid id)
     {
-        var dbTemplate = await context.Templates.FindAsync(id);
+        var dbTemplate = await templateRepository.FindAsync(id);
         
         if (dbTemplate != null)
         {
-            context.Templates.Remove(dbTemplate);
-            await context.SaveChangesAsync();
+            templateRepository.Remove(dbTemplate);
+            await templateRepository.SaveChangesAsync();
         }
 
         return NoContent();
