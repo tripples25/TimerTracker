@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using ChronoFlow.API.DAL;
 using ChronoFlow.API.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace ChronoFlow.API.Modules.UserModule
 {
@@ -15,11 +16,13 @@ namespace ChronoFlow.API.Modules.UserModule
     {
         private readonly ApplicationDbContext context;
         private readonly PasswordHasher passwordHasher;
+        private readonly IUsersService usersService;
 
-        public UserController(ApplicationDbContext context, PasswordHasher passwordHashers)
+        public UserController(IUsersService usersService, ApplicationDbContext context, PasswordHasher passwordHasher)
         {
+            this.usersService = usersService;
             this.context = context;
-            passwordHasher = passwordHashers;
+            this.passwordHasher = passwordHasher;
         }
 
         [HttpPost("register")]
@@ -29,15 +32,17 @@ namespace ChronoFlow.API.Modules.UserModule
             {
                 return BadRequest("User already exists.");
             }
-
-            var passwordHash = passwordHasher.CreatePasswordHash(request.Password);
+            var passwordSalt = new HMACSHA512().Key; // Завязаться на Соль из Config
+            var passwordHash = passwordHasher.CreatePasswordHash(request.Password, passwordSalt);
 
             var user = new UserEntity
             {
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
             };
+        
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
 
@@ -45,36 +50,9 @@ namespace ChronoFlow.API.Modules.UserModule
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLogInRequest request)
-        {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        public Task<ActionResult<Guid>> Login([FromBody] UserLogInRequest request)
+            => usersService.Login(request);
 
-            if (user == null)
-                return NotFound();
-
-            // Секрет на Соль можно держать в Config
-            if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash))
-                return BadRequest("Password is incorrect.");
-
-            var claims = new List<Claim>
-            {
-                new(type: ClaimTypes.Email, value: request.Email),
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity),
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    AllowRefresh = true,
-                    ExpiresUtc =
-                        DateTimeOffset.UtcNow.AddDays(100), // Потестить что через 10 минут можно всё ещё ходить под
-                    // залогиненым пользователем(токен не протух и обновился сам)
-                });
-
-            return Ok(user.Id);
-        }
 
         [Authorize]
         [HttpGet("signout")]
@@ -89,14 +67,13 @@ namespace ChronoFlow.API.Modules.UserModule
         public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            Console.WriteLine(user);
-            if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
+            if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
                 return BadRequest("Password is incorrect.");
 
-            user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword);
+            user.PasswordHash = passwordHasher.CreatePasswordHash(request.NewPassword, user.PasswordSalt);
             await context.SaveChangesAsync();
 
-            return Ok("Password successfully changed!");
+            return NoContent();
         }
     }
 }

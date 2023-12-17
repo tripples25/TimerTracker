@@ -7,4 +7,6 @@ public class TemplateEntity : IEntity
     [Key] 
     public Guid Id { get; set; }
     public string Name { get; set; }
+    
+    public HashSet<EventEntity> Events { get; set; }
 }
