@@ -11,10 +11,6 @@ public class ApplicationModule : IModule
     {
         services.AddControllers();
         //services.AddSingleton(configuration);
-        services.AddScoped<ITemplateService, TemplateService>();
-        services.AddScoped<IEventService, EventService>();
-        services.AddScoped<IUserService, UserService>();
-
         services.AddDbContext<ApplicationDbContext>();
 
         return services;

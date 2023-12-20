@@ -7,6 +7,7 @@ public class TemplateModule : IModule
 {
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
+        services.AddScoped<ITemplateService, TemplateService>();
         services.AddScoped<ITemplateRepository, TemplateRepository>();
 
         return services;

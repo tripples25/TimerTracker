@@ -7,6 +7,7 @@ public class EventModule : IModule
 {
     public IServiceCollection RegisterModule(IServiceCollection services)
     {
+        services.AddScoped<IEventService, EventService>();
         services.AddScoped<IEventRepository, EventRepository>();
         
         return services;

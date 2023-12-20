@@ -20,7 +20,7 @@ public class UserController : ControllerBase
 
 
     [HttpPost("login")]
-    public Task<ActionResult<Guid>> Login([FromBody] UserLogInRequest request)
+    public Task<ActionResult<UserLogInRequest>> Login([FromBody] UserLogInRequest request)
         => usersService.Login(request);
 
 

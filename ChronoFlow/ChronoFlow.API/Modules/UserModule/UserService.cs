@@ -43,7 +43,7 @@ public class UserService : ControllerBase, IUserService
         return NoContent();
     }
 
-    public async Task<ActionResult<Guid>> Login(UserLogInRequest request)
+    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
     {
         var user = await userRepository.FindAsync(request.Email);
         if (user == null)
@@ -65,8 +65,7 @@ public class UserService : ControllerBase, IUserService
             {
                 IsPersistent = true,
                 AllowRefresh = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(100), // Потестить что через 10 минут можно всё ещё ходить под
-                // залогиненым пользователем(токен не протух и обновился сам)
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1),
             });
         
         return Ok(user.Email);
