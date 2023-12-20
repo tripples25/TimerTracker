@@ -15,23 +15,23 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
-    public Task<IActionResult> Register([FromBody] UserRegisterRequest request)
+    public Task<ActionResult<UserRegisterRequest>> Register([FromBody] UserRegisterRequest request)
         => usersService.Register(request);
 
 
     [HttpPost("login")]
     public Task<ActionResult<UserLogInRequest>> Login([FromBody] UserLogInRequest request)
-        => usersService.Login(request);
+        => usersService.Login(HttpContext, request);
 
 
     [Authorize]
     [HttpGet("signout")]
     public Task<ActionResult> SignOutAsync()
-        => usersService.SignOutAsync();
+        => usersService.SignOutAsync(HttpContext);
 
 
     [Authorize]
     [HttpPost("password")]
-    public Task<ActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
+    public Task<ActionResult<UserChangePasswordRequest>> ChangePassword([FromBody] UserChangePasswordRequest request)
         => usersService.ChangePassword(request);
 }
