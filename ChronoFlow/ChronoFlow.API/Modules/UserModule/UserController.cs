@@ -18,17 +18,14 @@ public class UserController : ControllerBase
     public Task<ActionResult<UserRegisterRequest>> Register([FromBody] UserRegisterRequest request)
         => usersService.Register(request);
 
-
     [HttpPost("login")]
     public Task<ActionResult<UserLogInRequest>> Login([FromBody] UserLogInRequest request)
         => usersService.Login(HttpContext, request);
-
 
     [Authorize]
     [HttpGet("signout")]
     public Task<ActionResult> SignOutAsync()
         => usersService.SignOutAsync(HttpContext);
-
 
     [Authorize]
     [HttpPost("password")]

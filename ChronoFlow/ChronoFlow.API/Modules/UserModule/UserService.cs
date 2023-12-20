@@ -42,7 +42,7 @@ public class UserService : ControllerBase, IUserService
         return NoContent();
     }
 
-    public async Task<ActionResult<UserLogInRequest>> Login(HttpContext httpContext, UserLogInRequest request)
+    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
     {
         var user = await userRepository.FindAsync(request.Email);
         if (user == null)
@@ -58,6 +58,7 @@ public class UserService : ControllerBase, IUserService
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await httpContext.SignInAsync(
+            // TODO:  вся логика с HttpContext должна жить в контроллере
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity),
             new AuthenticationProperties
