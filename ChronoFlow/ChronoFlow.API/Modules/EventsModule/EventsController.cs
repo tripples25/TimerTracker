@@ -1,5 +1,7 @@
-﻿using ChronoFlow.API.DAL.Entities;
+﻿using AutoMapper;
+using ChronoFlow.API.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
 namespace ChronoFlow.API.Modules.EventsModule;
 
@@ -8,15 +10,22 @@ namespace ChronoFlow.API.Modules.EventsModule;
 public class EventsController : ControllerBase
 {
     private readonly IUnifyService<EventEntity> service;
+    private readonly IMapper mapper;
 
-    public EventsController(IUnifyService<EventEntity> service)
+    public EventsController(IUnifyService<EventEntity> service,
+        IMapper mapper)
     {
         this.service = service;
+        this.mapper = mapper;
     }
 
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
-        => service.GetAll();
+    {
+        var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
+
+        return service.GetAll();
+    }
 
     [HttpGet("{id:guid}")]
     public Task<ActionResult<EventEntity>> GetEvent([FromRoute] Guid id)

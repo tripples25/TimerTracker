@@ -1,22 +1,28 @@
-﻿using ChronoFlow.API.DAL;
+﻿using AutoMapper;
+using ChronoFlow.API.DAL;
 using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.DAL.Entities.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
 namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
 {
     private readonly IUnifyRepository<EventEntity> eventRepository;
+    private readonly IMapper mapper;
 
-    public EventService(IUnifyRepository<EventEntity> eventRepository)
+    public EventService(IUnifyRepository<EventEntity> eventRepository,
+        IMapper mapper)
     {
         this.eventRepository = eventRepository;
+        this.mapper = mapper;
     }
     
     public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
     {
+        
         var data = await eventRepository.ToListAsync();
 
         return Ok(data);
