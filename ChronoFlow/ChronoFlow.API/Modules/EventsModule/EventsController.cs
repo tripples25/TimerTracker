@@ -7,27 +7,27 @@ namespace ChronoFlow.API.Modules.EventsModule;
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
 {
-    private readonly IEventService service;
+    private readonly IUnifyService<EventEntity> service;
 
-    public EventsController(IEventService service)
+    public EventsController(IUnifyService<EventEntity> service)
     {
         this.service = service;
     }
 
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
-        => service.GetEvents();
+        => service.GetAll();
 
     [HttpGet("{id:guid}")]
     public Task<ActionResult<EventEntity>> GetEvent([FromRoute] Guid id)
-        => service.GetEvent(id);
+        => service.Get(id);
 
     [HttpPost]
     public Task<ActionResult<EventEntity>> CreateOrUpdateEvent([FromBody] EventEntity eventEntity)
-        => service.CreateOrUpdateEvent(eventEntity);
+        => service.CreateOrUpdate(eventEntity);
 
 
     [HttpDelete("{id:Guid}")]
     public Task<ActionResult> DeleteEvent([FromBody] Guid id)
-        => service.DeleteEvent(id);
+        => service.Delete(id);
 }

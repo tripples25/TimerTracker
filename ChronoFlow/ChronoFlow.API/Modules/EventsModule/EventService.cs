@@ -8,9 +8,9 @@ namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
 {
-    private readonly IEventRepository eventRepository;
+    private readonly IUnifyRepository<EventEntity> eventRepository;
 
-    public EventService( IEventRepository eventRepository)
+    public EventService(IUnifyRepository<EventEntity> eventRepository)
     {
         this.eventRepository = eventRepository;
     }
@@ -39,9 +39,7 @@ public class EventService : ControllerBase, IEventService
 
         if (dbEvent is null)
         {
-            eventEntity.Id = Guid.Empty;
-            eventEntity.StartTime = eventEntity.StartTime;
-            eventEntity.EndTime = eventEntity.EndTime;
+            
             isCreated = true;
 
             await eventRepository.AddAsync(eventEntity);

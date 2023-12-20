@@ -8,9 +8,9 @@ namespace ChronoFlow.API.Modules.TemplatesModule;
 
 public class TemplateService : ControllerBase, ITemplateService
 {
-    private readonly ITemplateRepository templateRepository;
+    private readonly IUnifyRepository<TemplateEntity> templateRepository;
 
-    public TemplateService(ITemplateRepository templateRepository)
+    public TemplateService(IUnifyRepository<TemplateEntity> templateRepository)
     {
         this.templateRepository = templateRepository;
     }

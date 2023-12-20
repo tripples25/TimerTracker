@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChronoFlow.API.Modules.EventsModule;
 
-public class EventRepository : IEventRepository
+public class EventRepository : IUnifyRepository<EventEntity>
 {
     private readonly ApplicationDbContext context;
 

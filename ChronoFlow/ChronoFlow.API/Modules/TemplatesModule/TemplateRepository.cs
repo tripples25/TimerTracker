@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChronoFlow.API.Modules.TemplatesModule;
 
-public class TemplateRepository : ITemplateRepository
+public class TemplateRepository : IUnifyRepository<TemplateEntity>
 {
     private readonly ApplicationDbContext context;
 
