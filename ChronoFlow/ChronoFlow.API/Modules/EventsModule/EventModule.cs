@@ -10,7 +10,7 @@ public class EventModule : IModule
     {
         services.AddScoped<IUnifyService<EventEntity>, UnifyService<EventEntity>>();
         services.AddScoped<IUnifyRepository<EventEntity>, UnifyRepository<EventEntity>>();
-        
+
         return services;
     }
 }

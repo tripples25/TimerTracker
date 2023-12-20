@@ -27,7 +27,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         if (entity is null)
             return NotFound("The template does not exist");
 
-        return Ok();
+        return Ok(entity);
     }
 
     public async Task<ActionResult<T>> CreateOrUpdate(T entireEntity)
@@ -38,12 +38,12 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         if (dbEntity is null)
         {
             entireEntity.UpdateFieldsFromEntity();
-            isCreated = true;
+            isCreated = true; // TODO: можно сократить isCreated = dbEntity is null
             await repository.AddAsync(entireEntity);
         }
         else
         {
-            dbEntity.CreateFieldsFromEntity(entireEntity);
+            dbEntity.CreateFieldsFromEntity(entireEntity); // TODO: Rename не отражает смысл метода
         }
 
         await repository.SaveChangesAsync();
