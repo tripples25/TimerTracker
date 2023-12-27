@@ -5,7 +5,7 @@ public class EventEntity : IEntity<EventEntity>
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public UserEntity User { get; set; }
+    //public UserEntity User { get; set; }
     //public TemplateEntity Template { get; set; }
     
     public void UpdateFieldsFromEntity()

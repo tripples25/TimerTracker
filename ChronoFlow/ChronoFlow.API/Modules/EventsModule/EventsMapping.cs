@@ -12,7 +12,7 @@ public class EventsMapping : Profile
         return new EventEntity
         {
             StartTime = @event.StartTime,
-            ...
+            //...
         };
     }
     

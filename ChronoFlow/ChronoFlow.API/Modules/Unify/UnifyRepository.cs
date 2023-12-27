@@ -17,7 +17,7 @@ public class UnifyRepository<T> : IUnifyRepository<T>
         this.context = context;
     }
 
-    public async Task<List<T?>> ToListAsync()
+    public async Task<List<T>> ToListAsync()
         => await Set.ToListAsync(); // TODO: На Set перейти
     
     // TODO: На связах обязательно нужен Include(T => T.Field) или у тя просто будут null вместо значений
@@ -27,10 +27,10 @@ public class UnifyRepository<T> : IUnifyRepository<T>
     
     // TODO: Nullabe - убить
     
-    public async Task<T?> FirstOrDefaultAsync(Guid id)
+    public async Task<T> FirstOrDefaultAsync(Guid id)
         => await context.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
 
-    public async Task<T?> FindAsync(Guid id)
+    public async Task<T> FindAsync(Guid id)
         => await context.Set<T>().FindAsync(id);
 
     public void Remove(T entity)
@@ -39,6 +39,6 @@ public class UnifyRepository<T> : IUnifyRepository<T>
     public async Task<int> SaveChangesAsync()
         => await context.SaveChangesAsync();
 
-    public async Task<EntityEntry<T>> AddAsync(T? entity)
-        => await context.Set<T?>().AddAsync(entity);
+    public async Task<EntityEntry<T>> AddAsync(T entity)
+        => await context.Set<T>().AddAsync(entity);
 }
