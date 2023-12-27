@@ -8,15 +8,15 @@ public class TemplateEntity : IEntity<TemplateEntity>
     public Guid Id { get; set; }
     public string Name { get; set; }
     
-    //public HashSet<EventEntity> Events { get; set; }
+    public HashSet<EventEntity> Events { get; set; }
     
-    public async void UpdateFieldsFromEntity()
+    public void UpdateFieldsFromEntity()
     {
         Id = Guid.Empty;
         Name = string.Empty;
     }
 
-    public async void CreateFieldsFromEntity(TemplateEntity? dbEntity)
+    public void CreateFieldsFromEntity(TemplateEntity? dbEntity)
     {
         dbEntity.Name = Name;
     }

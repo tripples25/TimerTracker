@@ -28,17 +28,17 @@ public class UnifyRepository<T> : IUnifyRepository<T>
     // TODO: Nullabe - убить
     
     public async Task<T> FirstOrDefaultAsync(Guid id)
-        => await context.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
+        => await Set.FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task<T> FindAsync(Guid id)
-        => await context.Set<T>().FindAsync(id);
+        => await Set.FindAsync(id);
 
     public void Remove(T entity)
-        => context.Set<T>().Remove(entity);
+        => Set.Remove(entity);
 
     public async Task<int> SaveChangesAsync()
         => await context.SaveChangesAsync();
 
     public async Task<EntityEntry<T>> AddAsync(T entity)
-        => await context.Set<T>().AddAsync(entity);
+        => await Set.AddAsync(entity);
 }

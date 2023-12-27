@@ -42,7 +42,8 @@ public class UserService : ControllerBase, IUserService
         return NoContent();
     }
 
-    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
+    //public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
+    public async Task<ActionResult<UserLogInRequest>> Login(HttpContext httpContext, UserLogInRequest request)
     {
         var user = await userRepository.FindAsync(request.Email);
         if (user == null)

@@ -34,7 +34,18 @@ namespace ChronoFlow.API.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid>("TemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UserEmail");
 
                     b.ToTable("Events");
                 });
@@ -67,13 +78,38 @@ namespace ChronoFlow.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
                     b.HasKey("Email");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ChronoFlow.API.DAL.Entities.EventEntity", b =>
+                {
+                    b.HasOne("ChronoFlow.API.DAL.Entities.TemplateEntity", "Template")
+                        .WithMany("Events")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChronoFlow.API.DAL.Entities.UserEntity", "User")
+                        .WithMany("Events")
+                        .HasForeignKey("UserEmail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ChronoFlow.API.DAL.Entities.TemplateEntity", b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("ChronoFlow.API.DAL.Entities.UserEntity", b =>
+                {
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }
