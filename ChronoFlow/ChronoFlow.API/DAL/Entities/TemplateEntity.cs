@@ -8,7 +8,7 @@ public class TemplateEntity : IEntity<TemplateEntity>
     public Guid Id { get; set; }
     public string Name { get; set; }
     
-    public HashSet<EventEntity> Events { get; set; }
+    public virtual List<EventEntity> Events { get; set; }
     
     public void UpdateFieldsFromEntity()
     {

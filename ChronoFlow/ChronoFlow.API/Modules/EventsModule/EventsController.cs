@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using ChronoFlow.API.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
 namespace ChronoFlow.API.Modules.EventsModule;
 
@@ -22,7 +21,7 @@ public class EventsController : ControllerBase
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
     {
-        var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
+        //var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
 
         return service.GetAll();
     }

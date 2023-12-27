@@ -17,13 +17,13 @@ public class UserRepository : IUserRepository
     }
 
     public bool Any(string email)
-        => context.Users.Any(u => u.Email == email);
+        => context.Users.Include(u => u.Events).Any(u => u.Email == email);
 
     public async Task<UserEntity?> FindAsync(string email)
         => await context.Users.FindAsync(email);
 
     public async Task<UserEntity?> FirstOrDefaultAsync(string email)
-        => await context.Users.FirstOrDefaultAsync(e => e.Email == email);
+        => await context.Users.Include(u => u.Events).FirstOrDefaultAsync(e => e.Email == email);
 
     public async Task<int> SaveChangesAsync()
         => await context.SaveChangesAsync();
