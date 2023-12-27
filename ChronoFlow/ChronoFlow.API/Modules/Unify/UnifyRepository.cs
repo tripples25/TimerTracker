@@ -43,7 +43,7 @@ public class UnifyRepository<T> : IUnifyRepository<T>
         return await set.Include(t => (t as EventEntity).Template).FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<T> FindAsync(Guid id)
+    public async Task<T?> FindAsync(Guid id)
         => await set.FindAsync(id);
 
     public void Remove(T entity)

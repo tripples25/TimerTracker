@@ -32,6 +32,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<EventEntity>()
             .HasOne(e => e.Template)
             .WithMany(t => t.Events);
+            
 
         // Конфигурация отношения "многие к одному" между EventEntity и UserEntity
         modelBuilder.Entity<EventEntity>()

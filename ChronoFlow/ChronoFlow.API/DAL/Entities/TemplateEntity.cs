@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper.Configuration.Annotations;
+using Newtonsoft.Json;
 
 namespace ChronoFlow.API.DAL.Entities;
 
@@ -7,8 +9,8 @@ public class TemplateEntity : IEntity<TemplateEntity>
     [Key] 
     public Guid Id { get; set; }
     public string Name { get; set; }
-    
-    public virtual List<EventEntity> Events { get; set; }
+    [Ignore]
+    public virtual List<EventEntity> Events { get; } = new List<EventEntity>();
     
     public void UpdateFieldsFromEntity()
     {

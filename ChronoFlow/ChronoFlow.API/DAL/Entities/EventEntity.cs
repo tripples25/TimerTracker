@@ -1,12 +1,19 @@
-﻿namespace ChronoFlow.API.DAL.Entities;
+﻿using AutoMapper.Configuration.Annotations;
+using Newtonsoft.Json;
+
+namespace ChronoFlow.API.DAL.Entities;
 
 public class EventEntity : IEntity<EventEntity>
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public virtual UserEntity User { get; set; }
-    public virtual TemplateEntity Template { get; set; }
+    public Guid? TemplateId { get; set; }
+    public string UserEmail { get; set; }
+    [Ignore, JsonIgnore]
+    public virtual UserEntity? User { get; } 
+    [Ignore, JsonIgnore]
+    public virtual TemplateEntity? Template { get; }
     
     public void UpdateFieldsFromEntity()
     {

@@ -30,27 +30,27 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         return Ok(entity);
     }
 
-    public async Task<ActionResult<T>> CreateOrUpdate(T entireEntity)
+    public async Task<ActionResult<T>> CreateOrUpdate(T requestEntity)
     {
-        var dbEntity = await repository.FindAsync(entireEntity.Id);
+        var dbEntity = await repository.FindAsync(requestEntity.Id);
         var isCreated = false;
 
         if (dbEntity is null)
         {
-            entireEntity.UpdateFieldsFromEntity();
+            requestEntity.UpdateFieldsFromEntity();
             isCreated = true; // TODO: можно сократить isCreated = dbEntity is null
-            await repository.AddAsync(entireEntity);
+            await repository.AddAsync(requestEntity);
         }
         else
         {
-            dbEntity.CreateFieldsFromEntity(entireEntity); // TODO: Rename не отражает смысл метода
+            dbEntity.CreateFieldsFromEntity(requestEntity); // TODO: Rename не отражает смысл метода
         }
 
         await repository.SaveChangesAsync();
 
         return Ok(new CreateOrUpdateResponse
         {
-            Id = entireEntity.Id,
+            Id = requestEntity.Id,
             IsCreated = isCreated,
         });
     }
