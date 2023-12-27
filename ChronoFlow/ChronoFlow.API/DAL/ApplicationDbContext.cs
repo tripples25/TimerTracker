@@ -23,4 +23,17 @@ public class ApplicationDbContext : DbContext
             builder => { builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); });
         base.OnConfiguring(optionsBuilder);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Конфигурация отношения "многие к одному" между EventEntity и TemplateEntity
+        modelBuilder.Entity<EventEntity>()
+            .HasOne(e => e.Template)
+            .WithMany(t => t.Events);
+
+        // Конфигурация отношения "многие к одному" между EventEntity и UserEntity
+        modelBuilder.Entity<EventEntity>()
+            .HasOne(e => e.User)
+            .WithMany(u => u.Events);
+    }
 }
