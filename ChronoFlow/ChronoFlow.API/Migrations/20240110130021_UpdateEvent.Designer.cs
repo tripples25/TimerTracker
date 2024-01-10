@@ -3,6 +3,7 @@ using System;
 using ChronoFlow.API.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChronoFlow.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240110130021_UpdateEvent")]
+    partial class UpdateEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,17 +40,21 @@ namespace ChronoFlow.API.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid?>("TemplateId")
+                    b.Property<Guid?>("TemplateEntityId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserEntityEmail")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TemplateId");
+                    b.HasIndex("TemplateEntityId");
 
-                    b.HasIndex("UserEmail");
+                    b.HasIndex("UserEntityEmail");
 
                     b.ToTable("Events");
                 });
@@ -87,17 +94,13 @@ namespace ChronoFlow.API.Migrations
 
             modelBuilder.Entity("ChronoFlow.API.DAL.Entities.EventEntity", b =>
                 {
-                    b.HasOne("ChronoFlow.API.DAL.Entities.TemplateEntity", "Template")
+                    b.HasOne("ChronoFlow.API.DAL.Entities.TemplateEntity", null)
                         .WithMany("Events")
-                        .HasForeignKey("TemplateId");
+                        .HasForeignKey("TemplateEntityId");
 
-                    b.HasOne("ChronoFlow.API.DAL.Entities.UserEntity", "User")
+                    b.HasOne("ChronoFlow.API.DAL.Entities.UserEntity", null)
                         .WithMany("Events")
-                        .HasForeignKey("UserEmail");
-
-                    b.Navigation("Template");
-
-                    b.Navigation("User");
+                        .HasForeignKey("UserEntityEmail");
                 });
 
             modelBuilder.Entity("ChronoFlow.API.DAL.Entities.TemplateEntity", b =>
