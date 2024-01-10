@@ -2,9 +2,8 @@
 
 namespace ChronoFlow.API.DAL.Entities;
 
-public interface IEntity<T>
+public interface IEntity
 {
-    [Key] public Guid Id { get; set; }
-    void UpdateFieldsFromEntity();
-    void CreateFieldsFromEntity(T? dbEntity);
+    [Key]
+    public Guid Id { get; set; }
 }
