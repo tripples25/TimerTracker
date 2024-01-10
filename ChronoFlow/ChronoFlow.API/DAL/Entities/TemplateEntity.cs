@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper.Configuration.Annotations;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace ChronoFlow.API.DAL.Entities;
 
 public class TemplateEntity : IEntity<TemplateEntity>
 {
-    [Key] 
+    [Key]
     public Guid Id { get; set; }
     public string Name { get; set; }
     [Ignore]

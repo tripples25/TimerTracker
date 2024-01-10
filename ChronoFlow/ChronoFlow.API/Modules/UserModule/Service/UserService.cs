@@ -18,10 +18,10 @@ namespace ChronoFlow.API.Modules.UserModule.Service;
 public class UserService : ControllerBase, IUserService
 {
     private readonly IUserRepository userRepository;
-    private readonly IEventRepository eventRepository;
+    private readonly IUnifyRepository<EventEntity> eventRepository;
     private readonly PasswordHasher passwordHasher;
 
-    public UserService(IUserRepository userRepository, PasswordHasher passwordHasher, IEventRepository eventRepository)
+    public UserService(IUserRepository userRepository, PasswordHasher passwordHasher, IUnifyRepository<EventEntity> eventRepository)
     {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;

@@ -13,7 +13,6 @@ public class EventEntity : IEntity<EventEntity>
 
     [Ignore, JsonIgnore]
     public virtual UserEntity? User { get; set; } 
-    [Ignore, JsonIgnore]
     public virtual TemplateEntity? Template { get; set;  }
     
     public void UpdateFieldsFromEntity()
