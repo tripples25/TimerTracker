@@ -1,17 +1,20 @@
-using ChronoFlow.API.DAL;
 using ChronoFlow.API.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var module = new ApplicationModule(builder.Configuration);
-module.RegisterModule(builder.Services);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-//смотреть Module
+builder.Services.AddSingleton(new Config(builder.Environment.IsDevelopment()));
+builder.Services.RegisterModules();
+
+
+/*var module = new ApplicationModule(builder.Configuration);
+module.RegisterModule(builder.Services);*/
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

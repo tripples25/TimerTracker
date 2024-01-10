@@ -1,8 +1,12 @@
-﻿namespace ChronoFlow.API.Infrastructure;
+﻿using System.Security.Cryptography;
+using System.Text;
+
+namespace ChronoFlow.API.Infrastructure;
 
 public class Config
 {
-    public string DatabaseConnectionString { get; init; }
+    public string DatabaseConnectionString { get; }
+    public byte[] PasswordSalt { get; } = new HMACSHA512(Encoding.ASCII.GetBytes("qlsdfgtbzxbs4qwe")).Key;
 
     public Config(bool isDev)
     {

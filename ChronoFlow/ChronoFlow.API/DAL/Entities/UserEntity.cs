@@ -1,9 +1,13 @@
-﻿namespace ChronoFlow.API.DAL.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ChronoFlow.API.DAL.Entities;
 
 public class UserEntity
 {
-    public Guid Id { get; set; }
+    [Key]
+    public string Email { get; set; }
     public string Name { get; set; }
     public string PasswordHash { get; set; }
-    public string Email { get; set; }
+
+    public virtual HashSet<EventEntity> Events { get; set; }
 }
