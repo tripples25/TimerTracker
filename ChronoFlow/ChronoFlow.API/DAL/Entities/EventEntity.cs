@@ -3,7 +3,9 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-public class EventEntity : IEntity
+namespace ChronoFlow.API.DAL.Entities;
+
+public class EventEntity : IEntity<EventEntity>
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }

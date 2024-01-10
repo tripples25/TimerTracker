@@ -1,4 +1,5 @@
-﻿using ChronoFlow.API.DAL.Entities;
+﻿using AutoMapper;
+using ChronoFlow.API.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoFlow.API.Modules.EventsModule;
@@ -7,27 +8,34 @@ namespace ChronoFlow.API.Modules.EventsModule;
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
 {
-    private readonly IEventService service;
+    private readonly IUnifyService<EventEntity> service;
+    private readonly IMapper mapper;
 
-    public EventsController(IEventService service)
+    public EventsController(IUnifyService<EventEntity> service,
+        IMapper mapper)
     {
         this.service = service;
+        this.mapper = mapper;
     }
 
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
-        => service.GetEvents();
+    {
+        //var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
+
+        return service.GetAll();
+    }
 
     [HttpGet("{id:guid}")]
     public Task<ActionResult<EventEntity>> GetEvent([FromRoute] Guid id)
-        => service.GetEvent(id);
+        => service.Get(id);
 
     [HttpPost]
     public Task<ActionResult<EventEntity>> CreateOrUpdateEvent([FromBody] EventEntity eventEntity)
-        => service.CreateOrUpdateEvent(eventEntity);
+        => service.CreateOrUpdate(eventEntity);
 
 
     [HttpDelete("{id:Guid}")]
     public Task<ActionResult> DeleteEvent([FromBody] Guid id)
-        => service.DeleteEvent(id);
+        => service.Delete(id);
 }
