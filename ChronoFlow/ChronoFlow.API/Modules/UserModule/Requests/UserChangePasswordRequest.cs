@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChronoFlow.API.Modules.UserModule
+namespace ChronoFlow.API.Modules.UserModule.Requests
 {
     public class UserChangePasswordRequest
     {

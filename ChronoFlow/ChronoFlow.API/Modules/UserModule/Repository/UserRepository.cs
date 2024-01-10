@@ -3,8 +3,7 @@ using ChronoFlow.API.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace ChronoFlow.API.Modules.UserModule;
-
+namespace ChronoFlow.API.Modules.UserModule.Repository;
 
 
 public class UserRepository : IUserRepository
@@ -22,12 +21,16 @@ public class UserRepository : IUserRepository
     public async Task<UserEntity?> FindAsync(string email)
         => await context.Users.FindAsync(email);
 
-    public async Task<UserEntity?> FirstOrDefaultAsync(string email)
-        => await context.Users.FirstOrDefaultAsync(e => e.Email == email);
-
     public async Task<int> SaveChangesAsync()
         => await context.SaveChangesAsync();
 
     public async Task<EntityEntry<UserEntity>> AddAsync(UserEntity? email)
         => await context.Users.AddAsync(email);
+
+    public async Task<List<UserEntity>> ToListAsync()
+        => await context.Users.ToListAsync();
+
+    public void Remove(UserEntity? userEntity)
+        => context.Users.Remove(userEntity);
+
 }
