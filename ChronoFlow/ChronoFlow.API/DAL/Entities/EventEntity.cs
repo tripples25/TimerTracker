@@ -14,17 +14,18 @@ public class EventEntity : IEntity<EventEntity>
     [Ignore, JsonIgnore]
     public virtual UserEntity? User { get; set; } 
     public virtual TemplateEntity? Template { get; set;  }
-    
+
+    public Guid? TemplateId { get; set; }
+
     public void UpdateFieldsFromEntity()
     {
         Id = Guid.Empty;
-        StartTime = StartTime;
-        EndTime = EndTime;
     }
 
     public void CreateFieldsFromEntity(EventEntity? dbEntity)
     {
-        dbEntity.StartTime = StartTime;
-        dbEntity.EndTime = EndTime;
+        dbEntity.StartTime = DateTime.Now;
+        TemplateId = Guid.Empty;
+        dbEntity.EndTime = null;
     }
 }
