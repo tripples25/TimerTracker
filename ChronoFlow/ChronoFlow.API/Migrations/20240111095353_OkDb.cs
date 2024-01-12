@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChronoFlow.API.Migrations
 {
     /// <inheritdoc />
-    public partial class Restart : Migration
+    public partial class OkDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,8 +43,8 @@ namespace ChronoFlow.API.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StartTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     EndTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    UserEmail = table.Column<string>(type: "text", nullable: false),
-                    TemplateId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserEmail = table.Column<string>(type: "text", nullable: true),
+                    TemplateId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,14 +53,12 @@ namespace ChronoFlow.API.Migrations
                         name: "FK_Events_Templates_TemplateId",
                         column: x => x.TemplateId,
                         principalTable: "Templates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Events_Users_UserEmail",
                         column: x => x.UserEmail,
                         principalTable: "Users",
-                        principalColumn: "Email",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Email");
                 });
 
             migrationBuilder.CreateIndex(

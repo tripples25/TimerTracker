@@ -1,4 +1,5 @@
-﻿using ChronoFlow.API.DAL;
+﻿using System.Linq.Expressions;
+using ChronoFlow.API.DAL;
 using ChronoFlow.API.DAL.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +18,16 @@ public class UnifyRepository<T> : IUnifyRepository<T>
         this.context = context;
     }
 
-    public async Task<List<T>> ToListAsync()
+    public async Task<List<T>> ToListAsync(params Expression<Func<T, object>>[] includeExpressions)
     {
-        if (typeof(T) == typeof(TemplateEntity))
+        var query = set.AsQueryable();
+
+        foreach (var includeExpression in includeExpressions)
         {
-            return await set.Include(t => (t as TemplateEntity).Events).ToListAsync();
+            query = query.Include(includeExpression);
         }
-        return await set.Include(t => (t as EventEntity).Template).ToListAsync();
+
+        return await query.ToListAsync();
     }
     
     // TODO: На связах обязательно нужен Include(T => T.Field) или у тя просто будут null вместо значений
@@ -33,17 +37,19 @@ public class UnifyRepository<T> : IUnifyRepository<T>
     
     // TODO: Nullabe - убить
 
-    public async Task<T> FirstOrDefaultAsync(Guid id)
+    public async Task<T> FirstOrDefaultAsync(Guid id, params Expression<Func<T, object>>[] includeExpressions)
     {
-        if (typeof(T) == typeof(TemplateEntity))
+        var query = set.AsQueryable();
+
+        foreach (var includeExpression in includeExpressions)
         {
-            return await set.Include(t => (t as TemplateEntity).Events).FirstOrDefaultAsync(e => e.Id == id);
+            query = query.Include(includeExpression);
         }
-        
-        return await set.Include(t => (t as EventEntity).Template).FirstOrDefaultAsync(e => e.Id == id);
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<T?> FindAsync(Guid id)
+    public async Task<T> FindAsync(Guid id)
         => await set.FindAsync(id);
 
     public void Remove(T entity)

@@ -12,7 +12,6 @@ builder.Services.RegisterModules();
 /*var module = new ApplicationModule(builder.Configuration);
 module.RegisterModule(builder.Services);*/
 
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

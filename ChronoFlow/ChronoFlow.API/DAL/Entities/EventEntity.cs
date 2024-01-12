@@ -14,9 +14,9 @@ public class EventEntity : IEntity<EventEntity>
     [Ignore, JsonIgnore]
     public virtual UserEntity? User { get; set; } 
     public virtual TemplateEntity? Template { get; set;  }
-
+    
     public Guid? TemplateId { get; set; }
-
+    
     public void UpdateFieldsFromEntity()
     {
         Id = Guid.Empty;
