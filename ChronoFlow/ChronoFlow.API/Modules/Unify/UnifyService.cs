@@ -1,4 +1,5 @@
-﻿using ChronoFlow.API.DAL.Entities;
+﻿using System.Linq.Expressions;
+using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.DAL.Entities.Response;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,19 +14,19 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         this.repository = repository;
     }
 
-    public async Task<ActionResult<IEnumerable<T>>> GetAll()
+    public async Task<ActionResult<IEnumerable<T>>> GetAll(params Expression<Func<T, object>>[] includeExpressions)
     {
         var data = await repository.ToListAsync();
 
         return Ok(data);
     }
 
-    public async Task<ActionResult<T>> Get(Guid id)
+    public async Task<ActionResult<T>> Get(Guid id, params Expression<Func<T, object>>[] includeExpressions)
     {
         var entity = await repository.FirstOrDefaultAsync(id);
 
         if (entity is null)
-            return NotFound("The template does not exist");
+            return NotFound($"The unknown entity does not exist");
 
         return Ok(entity);
     }
@@ -33,18 +34,15 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     public async Task<ActionResult<T>> CreateOrUpdate(T requestEntity)
     {
         var dbEntity = await repository.FindAsync(requestEntity.Id);
-        var isCreated = false;
+        var isCreated = dbEntity is null;
 
-        if (dbEntity is null)
+        if (isCreated)
         {
             requestEntity.UpdateFieldsFromEntity();
-            isCreated = true; // TODO: можно сократить isCreated = dbEntity is null
             await repository.AddAsync(requestEntity);
         }
         else
-        {
-            dbEntity.CreateFieldsFromEntity(requestEntity); // TODO: Rename не отражает смысл метода
-        }
+            dbEntity.CreateFieldsFromEntity(requestEntity);
 
         await repository.SaveChangesAsync();
 
@@ -52,6 +50,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         {
             Id = requestEntity.Id,
             IsCreated = isCreated,
+            //EntityType = requestEntity.GetType().Name
         });
     }
 
@@ -66,5 +65,28 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         }
 
         return NoContent();
+    }
+
+    public async Task<ActionResult<T>> StopTracking(T stopRequestEntity)
+    {
+        var dbEntity = await repository.FindAsync(stopRequestEntity.Id);
+        var isCreated = dbEntity is null;
+
+        if (isCreated)
+        {
+            stopRequestEntity.UpdateFieldsFromEntity();
+            await repository.AddAsync(stopRequestEntity);
+        }
+        else
+            dbEntity.CreateFieldsFromEntity(stopRequestEntity);
+
+        await repository.SaveChangesAsync();
+
+        return Ok(new CreateOrUpdateResponse
+        {
+            Id = stopRequestEntity.Id,
+            IsCreated = isCreated,
+            //EntityType = requestEntity.GetType().Name
+        });
     }
 }

@@ -12,6 +12,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
         <PackageReference Include="Catalyst" Version="1.0.44215" />
         <PackageReference Include="Catalyst.Models.English" Version="1.0.30952" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.15" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.14" />
@@ -27,6 +28,8 @@
 
     <ItemGroup>
       <Folder Include="Migrations\" />
+      <Folder Include="Modules\Unify\Repository\" />
+      <Folder Include="Modules\Unify\Service\" />
     </ItemGroup>
 
 </Project>
