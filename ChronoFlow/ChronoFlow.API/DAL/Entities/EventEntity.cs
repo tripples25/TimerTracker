@@ -9,6 +9,7 @@ public class EventEntity : IEntity<EventEntity>
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }
+    [JsonIgnore]
     public DateTime? EndTime { get; set; }
 
     [Ignore, JsonIgnore]
@@ -16,16 +17,17 @@ public class EventEntity : IEntity<EventEntity>
     public virtual TemplateEntity? Template { get; set;  }
     
     public Guid? TemplateId { get; set; }
+    public string? UserEmail { get; set; }
     
-    public void UpdateFieldsFromEntity()
+    public void UpdateFieldsFromEntity(EventEntity? dbEntity)
     {
-        Id = Guid.Empty;
+        dbEntity.TemplateId = TemplateId;
     }
 
     public void CreateFieldsFromEntity(EventEntity? dbEntity)
     {
-        dbEntity.StartTime = DateTime.Now;
+        StartTime = DateTime.Now;
+        EndTime = default;
         TemplateId = Guid.Empty;
-        dbEntity.EndTime = null;
     }
 }

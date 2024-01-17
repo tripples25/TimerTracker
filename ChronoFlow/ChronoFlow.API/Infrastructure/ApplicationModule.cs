@@ -11,8 +11,8 @@ public class ApplicationModule : IModule
     {
         services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-        //services.AddSingleton(configuration);
         services.AddDbContext<ApplicationDbContext>();
+        //services.AddAutoMapper(typeof(Program).Assembly);
 
         return services;
     }
