@@ -34,7 +34,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     public async Task<ActionResult<T>> CreateOrUpdate(T requestEntity)
     {
         var dbEntity = await repository.FindAsync(requestEntity.Id);
-        var isCreated = dbEntity is null;
+        var isCreated = dbEntity is not null;
 
         if (isCreated)
         {
@@ -67,26 +67,5 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         return NoContent();
     }
 
-    public async Task<ActionResult<T>> StopTracking(T stopRequestEntity)
-    {
-        var dbEntity = await repository.FindAsync(stopRequestEntity.Id);
-        var isCreated = dbEntity is null;
 
-        if (isCreated)
-        {
-            stopRequestEntity.UpdateFieldsFromEntity();
-            await repository.AddAsync(stopRequestEntity);
-        }
-        else
-            dbEntity.CreateFieldsFromEntity(stopRequestEntity);
-
-        await repository.SaveChangesAsync();
-
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = stopRequestEntity.Id,
-            IsCreated = isCreated,
-            //EntityType = requestEntity.GetType().Name
-        });
-    }
 }

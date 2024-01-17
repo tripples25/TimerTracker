@@ -1,4 +1,4 @@
-﻿/*using ChronoFlow.API.DAL;
+﻿using ChronoFlow.API.DAL;
 using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.DAL.Entities.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -7,74 +7,28 @@ namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IEventRepository eventRepository;
-    
-    public EventService( IEventRepository eventRepository)
+    private readonly IUnifyRepository<EventEntity> eventRepository;
+
+    public EventService(IUnifyRepository<EventEntity> eventRepository)
     {
-        this.context = context;
         this.eventRepository = eventRepository;
     }
 
-    public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
+    public async Task<ActionResult<EventEntity>> StopTracking(Guid eventId)
     {
-        var data = await eventRepository.ToListAsync();
+        var eventDbEntity = await eventRepository.FindAsync(eventId);
+        var isNotCreated = eventDbEntity is null;
 
-        return Ok(data);
-    }
-
-    public async Task<ActionResult<EventEntity>> GetEvent(Guid id)
-    {
-        var currentEvent = await eventRepository.FirstOrDefaultAsync(id);
-
-        if (currentEvent is null)
-            return NotFound("The event does not exist");
-        return Ok(currentEvent);
-    }
-
-    public async Task<ActionResult<EventEntity>> CreateOrUpdateEvenat(EventEntity eventEntity)
-    {
-        var dbEvent = await eventRepository.FindAsync(eventEntity.Id);
-        var isCreated = false;
-
-        if (dbEvent is null)
+        if (isNotCreated)
         {
-            eventEntity.Id = Guid.Empty;
-            eventEntity.StartTime = eventEntity.StartTime;
-            eventEntity.EndTime = eventEntity.EndTime;
-            isCreated = true;
-
-            await context.Events.AddAsync(eventEntity);
-            await eventRepository.AddAsync(eventEntity);
+            return NotFound();
         }
-        else
-        {
-            dbEvent.StartTime = eventEntity.StartTime;
-            dbEvent.EndTime = eventEntity.EndTime;
-        }
+        eventDbEntity.EndTime = DateTime.Now;
+        await eventRepository.AddAsync(eventDbEntity);
 
-        await context.SaveChangesAsync();
-        await eventRepository.SaveChangesAsync();
 
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = eventEntity.Id,
-            IsCreated = isCreated
-        });
+        return Ok();
     }
 
-    public async Task<ActionResult> DeleteEvent(Guid id)
-    {
-        var dbEvent = await eventRepository.FindAsync(id);
 
-        if (dbEvent != null)
-        {
-            context.Events.Remove(dbEvent);
-            await context.SaveChangesAsync();
-            eventRepository.Remove(dbEvent);
-            await eventRepository.SaveChangesAsync();
-        }
-
-        return NoContent();
-    }
-}*/
+}

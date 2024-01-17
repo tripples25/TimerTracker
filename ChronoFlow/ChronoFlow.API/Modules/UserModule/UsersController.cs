@@ -1,5 +1,6 @@
 using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.Modules.UserModule.Requests;
+using ChronoFlow.API.Modules.UserModule.Response;
 using ChronoFlow.API.Modules.UserModule.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,5 +60,10 @@ public class UsersController : ControllerBase
     [HttpDelete("{email}/events/{eventGuid}")]
     public Task<ActionResult<UserEntity>> DeleteUserEvent([FromRoute] string email, [FromRoute] Guid eventGuid)
         => usersService.DeleteUserEvent(email, eventGuid);
+
+    [HttpGet("{email}/analytics")]
+    public Task<ActionResult<AnalyticsResponse>> GetUser([FromRoute] string email, [FromBody] UserAnalyticsRequests requests)
+        => usersService.GetAnalytics(email, requests);
+
 
 }   

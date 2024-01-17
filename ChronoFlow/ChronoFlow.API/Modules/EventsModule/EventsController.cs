@@ -7,7 +7,8 @@ namespace ChronoFlow.API.Modules.EventsModule;
 [ApiController]
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
-{
+{   
+    private readonly IEventService eventService;
     private readonly IUnifyService<EventEntity> service;
     private readonly IMapper mapper;
 
@@ -38,4 +39,8 @@ public class EventsController : ControllerBase
     [HttpDelete("{id:Guid}")]
     public Task<ActionResult> DeleteEvent([FromBody] Guid id)
         => service.Delete(id);
+
+    [HttpPost("{id:Guid}/stopTracking")]
+    public Task<ActionResult<EventEntity>> StopTracking([FromRoute] Guid id)
+    => eventService.StopTracking(id);
 }
