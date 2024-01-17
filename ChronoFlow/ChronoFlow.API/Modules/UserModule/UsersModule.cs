@@ -11,6 +11,7 @@ public class UserModule : IModule
         services.AddSingleton<PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddAutoMapper(typeof(UsersMapping));
         
         return services;
     }
