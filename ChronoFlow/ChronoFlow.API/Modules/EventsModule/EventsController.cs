@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ChronoFlow.API.DAL.Entities;
+using ChronoFlow.API.Modules.UserModule.Requests;
+using ChronoFlow.API.Modules.UserModule.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoFlow.API.Modules.EventsModule;
@@ -42,5 +44,17 @@ public class EventsController : ControllerBase
 
     [HttpPost("{id:Guid}/stopTracking")]
     public Task<ActionResult<EventEntity>> StopTracking([FromRoute] Guid id)
-    => eventService.StopTracking(id);
+        => eventService.StopTracking(id);
+
+    [HttpPost("/AddToUser/")]
+    public Task<ActionResult<UserEntity>> AddUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
+        => eventService.AddUserEvent(email, eventGuid);
+
+    [HttpDelete("/DeleteFromUser/")]
+    public Task<ActionResult<UserEntity>> DeleteUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
+        => eventService.DeleteUserEvent(email, eventGuid);
+
+    [HttpGet("/analytics/")]
+    public Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string email, [FromQuery] UserAnalyticsRequests requests)
+        => eventService.GetAnalytics(email, requests);
 }

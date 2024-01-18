@@ -25,12 +25,12 @@ public class UsersController : ControllerBase
 
     [HttpPost("login")]
     public Task<ActionResult<UserLogInRequest>> Login([FromBody] UserLogInRequest request)
-        => usersService.Login(request);
+        => usersService.Login(request, this.HttpContext);
 
     [Authorize]
     [HttpGet("signout")]
     public Task<ActionResult> SignOutAsync()
-        => usersService.SignOutAsync();
+        => usersService.SignOutAsync(this.HttpContext);
 
     [Authorize]
     [HttpPost("password")]
@@ -53,17 +53,7 @@ public class UsersController : ControllerBase
     public Task<ActionResult<UserEntity>> CreateOrUpdateUser([FromBody] UserEntity userEntity)
         => usersService.CreateOrUpdateUser(userEntity);
 
-    [HttpPost("{email}/events/{eventGuid}")]
-    public Task<ActionResult<UserEntity>> AddUserEvent([FromRoute] string email, [FromRoute] Guid eventGuid)
-        => usersService.AddUserEvent(email, eventGuid);
 
-    [HttpDelete("{email}/events/{eventGuid}")]
-    public Task<ActionResult<UserEntity>> DeleteUserEvent([FromRoute] string email, [FromRoute] Guid eventGuid)
-        => usersService.DeleteUserEvent(email, eventGuid);
-
-    [HttpGet("{email}/analytics")]
-    public Task<ActionResult<AnalyticsResponse>> GetUser([FromRoute] string email, [FromBody] UserAnalyticsRequests requests)
-        => usersService.GetAnalytics(email, requests);
 
 
 }   

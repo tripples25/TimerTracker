@@ -13,19 +13,19 @@ public class UserService : ControllerBase, IUserService
 {
     private readonly IMapper mapper;
     private readonly IUserRepository userRepository;
-    private readonly IUnifyRepository<EventEntity> eventRepository;
+    //private readonly IUnifyRepository<EventEntity> eventRepository;
     private readonly PasswordHasher passwordHasher;
 
     public UserService(
         IMapper mapper,
         IUserRepository userRepository,
-        PasswordHasher passwordHasher,
-        IUnifyRepository<EventEntity> eventRepository)
+        PasswordHasher passwordHasher
+/*        IUnifyRepository<EventEntity> eventRepository*/)
     {
         this.mapper = mapper;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
-        this.eventRepository = eventRepository;
+        //this.eventRepository = eventRepository;
     }
 
     public async Task<ActionResult<UserRegisterRequest>> Register(UserRegisterRequest request)
@@ -50,13 +50,12 @@ public class UserService : ControllerBase, IUserService
         return NoContent();
     }
 
-    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
+    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request, HttpContext httpContext)
     {
         var user = await userRepository.FindAsync(request.Email);
         if (user == null)
             return NotFound();
 
-        // Секрет на Соль можно держать в Config
         if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash))
             return BadRequest("Password is incorrect.");
 
@@ -66,10 +65,7 @@ public class UserService : ControllerBase, IUserService
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        throw new Exception("Неправильно. У тя тут HttpContext уже сдох. С ним действия доллжны быть в Контроллере");
-
-        await HttpContext.SignInAsync(
-            // TODO:  вся логика с HttpContext должна жить в контроллере
+        await httpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity),
             new AuthenticationProperties
@@ -82,11 +78,9 @@ public class UserService : ControllerBase, IUserService
         return Ok(user.Email);
     }
 
-    public async Task<ActionResult> SignOutAsync()
+    public async Task<ActionResult> SignOutAsync(HttpContext httpContext)
     {
-        throw new Exception("Аналогично");
-
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         return NoContent();
     }
@@ -138,8 +132,8 @@ public class UserService : ControllerBase, IUserService
     public async Task<ActionResult> DeleteUser(string email)
     {
         var user = await userRepository.FindAsync(email);
-        if (user == null)
-            return NotFound(); // Best practice - всегда кидать 2xx даже если сущность уже удалена
+        //if (user == null)
+        //    return NoContent(); 
 
         userRepository.Remove(user);
         await userRepository.SaveChangesAsync();
