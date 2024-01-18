@@ -28,8 +28,6 @@
 
     <ItemGroup>
       <Folder Include="Migrations\" />
-      <Folder Include="Modules\Unify\Repository\" />
-      <Folder Include="Modules\Unify\Service\" />
     </ItemGroup>
 
 </Project>

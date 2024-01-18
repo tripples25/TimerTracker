@@ -9,25 +9,25 @@ public class EventEntity : IEntity<EventEntity>
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }
-    [Ignore, JsonIgnore]
+    [JsonIgnore]
     public DateTime? EndTime { get; set; }
 
     [Ignore, JsonIgnore]
-    public virtual UserEntity? User { get; set; }
-    public virtual TemplateEntity? Template { get; set; }
-
-    //public Guid? TemplateId { get; set; }
-
-    public void UpdateFieldsFromEntity()
+    public virtual UserEntity? User { get; set; } 
+    public virtual TemplateEntity? Template { get; set;  }
+    
+    public Guid? TemplateId { get; set; }
+    public string? UserEmail { get; set; }
+    
+    public void UpdateFieldsFromEntity(EventEntity? dbEntity)
     {
-        Id = Guid.Empty;
+        dbEntity.TemplateId = TemplateId;
     }
 
     public void CreateFieldsFromEntity(EventEntity? dbEntity)
     {
-        dbEntity.StartTime = DateTime.Now;
-        //dbEntity.Template =
-        //TemplateId = Guid.Empty;
-        dbEntity.EndTime = null;
+        StartTime = DateTime.Now;
+        EndTime = default;
+        TemplateId = Guid.Empty;
     }
 }

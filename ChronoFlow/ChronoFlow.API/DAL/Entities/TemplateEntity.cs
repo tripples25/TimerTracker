@@ -12,14 +12,12 @@ public class TemplateEntity : IEntity<TemplateEntity>
     [Ignore]
     public virtual List<EventEntity> Events { get; } = new List<EventEntity>();
     
-    public void UpdateFieldsFromEntity()
+    public void UpdateFieldsFromEntity(TemplateEntity? dbEntity)
     {
-        Id = Guid.Empty;
-        Name = string.Empty;
+        dbEntity.Name = Name;
     }
 
     public void CreateFieldsFromEntity(TemplateEntity? dbEntity)
     {
-        dbEntity.Name = Name;
     }
 }
