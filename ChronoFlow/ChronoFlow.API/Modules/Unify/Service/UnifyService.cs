@@ -21,7 +21,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
 
     public async Task<ActionResult<IEnumerable<T>>> GetAll(params Expression<Func<T, object>>[] includeExpressions)
     {
-        throw new Exception("`includeExpressions` не используется");
+        //throw new Exception("`includeExpressions` не используется");
 
         var data = await repository.ToListAsync();
 
@@ -31,7 +31,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     public async Task<ActionResult<T>> Get(Guid id, params Expression<Func<T, object>>[] includeExpressions)
     {
         
-        throw new Exception("`includeExpressions` не используется");
+        //throw new Exception("`includeExpressions` не используется");
 
         
         var entity = await repository.FirstOrDefaultAsync(id);
@@ -45,10 +45,10 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     public async Task<ActionResult<T>> CreateOrUpdate(T requestEntity)
     {
         var dbEntity = await repository.FindAsync(requestEntity.Id);
-        throw new Exception(@"За `is not null` убивают");
+        //throw new Exception(@"За `is not null` убивают");
         var isCreated = dbEntity is not null; // True - обновить, False - создать
 
-        throw new Exception(@"Используй Маппер, а не `UpdateFieldsFromEntity`/`CreateFieldsFromEntity`");
+        //throw new Exception(@"Используй Маппер, а не `UpdateFieldsFromEntity`/`CreateFieldsFromEntity`");
         if (isCreated)
         {
             requestEntity.UpdateFieldsFromEntity(dbEntity);
@@ -83,21 +83,20 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     }
 
 
-        if (isCreated)
-        {
-            //stopRequestEntity.UpdateFieldsFromEntity();
-            await repository.AddAsync(stopRequestEntity);
-        }
-        else
-            dbEntity.CreateFieldsFromEntity(stopRequestEntity);
+        //if (isCreated)
+        //{
+        //    //stopRequestEntity.UpdateFieldsFromEntity();
+        //    await repository.AddAsync(stopRequestEntity);
+        //}
+        //else
+        //    dbEntity.CreateFieldsFromEntity(stopRequestEntity);
 
-        await repository.SaveChangesAsync();
+        //await repository.SaveChangesAsync();
 
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = stopRequestEntity.Id,
-            IsCreated = isCreated,
-            //EntityType = requestEntity.GetType().Name
-        });
-    }
+        //return Ok(new CreateOrUpdateResponse
+        //{
+        //    Id = stopRequestEntity.Id,
+        //    IsCreated = isCreated,
+        //    //EntityType = requestEntity.GetType().Name
+        //});
 }

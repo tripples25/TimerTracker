@@ -2,20 +2,16 @@
 {
     public class EventAnalyticsModule
     {
-        private string name { get; set; }
-        private int timeInMinutes { get; set; }
-        private int timeInHours { get; set; }
-        private int timeInSeconds { get; set; }
-        private int count { get; set; }
-        private int totalCount { get; set; }
+        public string Name { get; set; }
+        public TimeSpan Time { get; set; }
+        public int Count { get; set; }
+        public int TotalCount { get; set; }
         //private int arithmeticMeanTimeInS { get; set; }
-        public EventAnalyticsModule(string name, int timeInMinutes, int timeInHours, int timeInSeconds, int count)
+        public EventAnalyticsModule(string name, TimeSpan time, int count)
         {
-            this.name = name;
-            this.timeInMinutes = timeInMinutes;
-            this.timeInHours = timeInHours;
-            this.timeInSeconds = timeInSeconds;
-            this.count = count;
+            this.Name = name;
+            this.Time = time;
+            this.Count = count;
 
         }
 

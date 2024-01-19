@@ -1,6 +1,5 @@
 using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.Modules.UserModule.Requests;
-using ChronoFlow.API.Modules.UserModule.Response;
 using ChronoFlow.API.Modules.UserModule.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -13,19 +13,17 @@ public class UserService : ControllerBase, IUserService
 {
     private readonly IMapper mapper;
     private readonly IUserRepository userRepository;
-    //private readonly IUnifyRepository<EventEntity> eventRepository;
     private readonly PasswordHasher passwordHasher;
 
     public UserService(
         IMapper mapper,
         IUserRepository userRepository,
         PasswordHasher passwordHasher
-/*        IUnifyRepository<EventEntity> eventRepository*/)
+        )
     {
         this.mapper = mapper;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
-        //this.eventRepository = eventRepository;
     }
 
     public async Task<ActionResult<UserRegisterRequest>> Register(UserRegisterRequest request)
@@ -132,77 +130,10 @@ public class UserService : ControllerBase, IUserService
     public async Task<ActionResult> DeleteUser(string email)
     {
         var user = await userRepository.FindAsync(email);
-        //if (user == null)
-        //    return NoContent(); 
 
         userRepository.Remove(user);
         await userRepository.SaveChangesAsync();
 
         return NoContent();
     }
-    
-    // Декомпозировать логику. Слишком большая ответственность на сервисе
-
-    /*public async Task<ActionResult<UserEntity>> AddUserEvent(string email, Guid eventId)
-    {
-        var user = await userRepository.FindAsync(email);
-        var eventEntity = await eventRepository.FindAsync(eventId);
-        if (user == null || eventEntity == null)
-            return NotFound();
-
-        user.Events.Add(eventEntity);
-        await userRepository.SaveChangesAsync();
-
-        return Ok(user);
-    }
-
-    public async Task<ActionResult<UserEntity>> DeleteUserEvent(string email, Guid eventId)
-    {
-        var user = await userRepository.FindAsync(email);
-        var eventEntity = await eventRepository.FindAsync(eventId);
-        if (user == null || eventEntity == null)
-            return NotFound();
-
-        user.Events.Remove(eventEntity);
-        await userRepository.SaveChangesAsync();
-
-        return Ok(user);
-    }*/
-
-    /*public async Task<ActionResult<AnalyticsResponse>> GetAnalytics(string email, UserAnalyticsRequests request)
-    {
-        var analyticsEventEntity = new HashSet<EventAnalyticsModule>();
-        var user = await userRepository.FindAsync(email);
-        var events = user.Events
-            .Where(d => d.StartTime >= request.Start && d.EndTime <= request.End)
-            .GroupBy(n => n.Template.Name);
-        int totalHours = default;
-        int totalCount = default;
-        foreach (var group in events)
-        {
-            string name = group.Key;
-            int timeInMinutes = default;
-            int count = group.Count();
-            totalCount += count;
-            foreach (var e in group)
-            {
-                timeInMinutes += (int) (e.EndTime - e.StartTime).Value.TotalMinutes;
-                totalHours += timeInMinutes;
-            }
-
-            analyticsEventEntity.Add
-            (
-                new EventAnalyticsModule
-                (
-                    name,
-                    timeInMinutes,
-                    timeInMinutes / 60,
-                    timeInMinutes * 60,
-                    count
-                )
-            );
-        }
-
-        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalHours));
-    }*/
 }

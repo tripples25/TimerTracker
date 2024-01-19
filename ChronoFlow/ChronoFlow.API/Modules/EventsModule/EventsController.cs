@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.Modules.UserModule.Requests;
-using ChronoFlow.API.Modules.UserModule.Response;
+using ChronoFlow.API.Modules.EventsModule.Response;
+using ChronoFlow.API.Modules.EventsModule.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ChronoFlow.API.Modules.EventsModule;
 
@@ -14,11 +15,14 @@ public class EventsController : ControllerBase
     private readonly IUnifyService<EventEntity> service;
     private readonly IMapper mapper;
 
-    public EventsController(IUnifyService<EventEntity> service,
-        IMapper mapper)
+    public EventsController(
+        IUnifyService<EventEntity> service,
+        IMapper mapper,
+        IEventService eventService)
     {
         this.service = service;
         this.mapper = mapper;
+        this.eventService = eventService;
     }
 
     [HttpGet]
@@ -46,15 +50,19 @@ public class EventsController : ControllerBase
     public Task<ActionResult<EventEntity>> StopTracking([FromRoute] Guid id)
         => eventService.StopTracking(id);
 
-    [HttpPost("/AddToUser/")]
+    [HttpPost("addToUser")]
     public Task<ActionResult<UserEntity>> AddUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
         => eventService.AddUserEvent(email, eventGuid);
 
-    [HttpDelete("/DeleteFromUser/")]
+    [HttpDelete("deleteFromUser")]
     public Task<ActionResult<UserEntity>> DeleteUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
         => eventService.DeleteUserEvent(email, eventGuid);
 
-    [HttpGet("/analytics/")]
-    public Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string email, [FromQuery] UserAnalyticsRequests requests)
+    [HttpGet("analytics")]
+    public Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string email, [FromQuery] EventDateFilterRequest requests)
         => eventService.GetAnalytics(email, requests);
+
+    [HttpGet("TestEventsWithFilter")]
+    public Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents([FromQuery]EventDateFilterRequest request)
+        => eventService.GetEvents(request);
 }
