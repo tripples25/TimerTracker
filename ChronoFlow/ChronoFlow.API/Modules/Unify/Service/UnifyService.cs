@@ -68,13 +68,4 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
 
         return NoContent();
     }
-
-    public async Task<ActionResult<T>> StopTracking(T stopRequestEntity)
-    {
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = stopRequestEntity.Id,
-            IsCreated = "да хуй его знает" == "дай хуй его знает"
-        });
-    }
 }

@@ -1,31 +1,31 @@
-﻿using System.Reflection;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using ChronoFlow.API.DAL;
+﻿using System.Security.Claims;
+using AutoMapper;
 using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.DAL.Entities.Response;
-using ChronoFlow.API.Modules.EventsModule;
-using ChronoFlow.API.Modules.TemplatesModule;
 using ChronoFlow.API.Modules.UserModule.Repository;
 using ChronoFlow.API.Modules.UserModule.Requests;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ChronoFlow.API.Modules.UserModule.Service;
 
 public class UserService : ControllerBase, IUserService
 {
+    private readonly IMapper mapper;
     private readonly IUserRepository userRepository;
-    private readonly IUnifyRepository<EventEntity> eventRepository;
+    //private readonly IUnifyRepository<EventEntity> eventRepository;
     private readonly PasswordHasher passwordHasher;
 
-    public UserService(IUserRepository userRepository, PasswordHasher passwordHasher, IUnifyRepository<EventEntity> eventRepository)
+    public UserService(
+        IMapper mapper,
+        IUserRepository userRepository,
+        PasswordHasher passwordHasher
+/*        IUnifyRepository<EventEntity> eventRepository*/)
     {
+        this.mapper = mapper;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
-        this.eventRepository = eventRepository;
+        //this.eventRepository = eventRepository;
     }
 
     public async Task<ActionResult<UserRegisterRequest>> Register(UserRegisterRequest request)
@@ -50,13 +50,12 @@ public class UserService : ControllerBase, IUserService
         return NoContent();
     }
 
-    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request)
+    public async Task<ActionResult<UserLogInRequest>> Login(UserLogInRequest request, HttpContext httpContext)
     {
         var user = await userRepository.FindAsync(request.Email);
         if (user == null)
             return NotFound();
 
-        // Секрет на Соль можно держать в Config
         if (!passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash))
             return BadRequest("Password is incorrect.");
 
@@ -65,8 +64,8 @@ public class UserService : ControllerBase, IUserService
             new(type: ClaimTypes.Email, value: request.Email),
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        await HttpContext.SignInAsync(
-            // TODO:  вся логика с HttpContext должна жить в контроллере
+
+        await httpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity),
             new AuthenticationProperties
@@ -79,9 +78,9 @@ public class UserService : ControllerBase, IUserService
         return Ok(user.Email);
     }
 
-    public async Task<ActionResult> SignOutAsync()
+    public async Task<ActionResult> SignOutAsync(HttpContext httpContext)
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         return NoContent();
     }
@@ -89,6 +88,9 @@ public class UserService : ControllerBase, IUserService
     public async Task<ActionResult<UserChangePasswordRequest>> ChangePassword(UserChangePasswordRequest request)
     {
         var user = await userRepository.FindAsync(request.Email);
+        if (user == null)
+            return BadRequest("SoSi biby");
+
         if (!passwordHasher.VerifyPasswordHash(request.CurrentPassword, user.PasswordHash))
             return BadRequest("Password is incorrect.");
 
@@ -118,34 +120,30 @@ public class UserService : ControllerBase, IUserService
     {
         var user = await userRepository.FindAsync(userEntity.Email);
         if (user == null)
-        {
             await userRepository.AddAsync(userEntity);
-            return Ok(userEntity);
-        }
-        var userProp = user.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        var inputUserProp = userEntity.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        for (int i = 0; i < inputUserProp.Length; i++)
-        {
-            userProp[i].SetValue(userEntity, inputUserProp[i].GetValue(userEntity));
-        }
-        await userRepository.SaveChangesAsync();
+        else
+            mapper.Map(userEntity, user);
 
+        await userRepository.SaveChangesAsync();
+        
         return Ok(user);
     }
 
     public async Task<ActionResult> DeleteUser(string email)
     {
         var user = await userRepository.FindAsync(email);
-        if (user == null)
-            return NotFound();
+        //if (user == null)
+        //    return NoContent(); 
 
         userRepository.Remove(user);
         await userRepository.SaveChangesAsync();
 
         return NoContent();
     }
+    
+    // Декомпозировать логику. Слишком большая ответственность на сервисе
 
-    public async Task<ActionResult<UserEntity>> AddUserEvent(string email, Guid eventId)
+    /*public async Task<ActionResult<UserEntity>> AddUserEvent(string email, Guid eventId)
     {
         var user = await userRepository.FindAsync(email);
         var eventEntity = await eventRepository.FindAsync(eventId);
@@ -169,5 +167,42 @@ public class UserService : ControllerBase, IUserService
         await userRepository.SaveChangesAsync();
 
         return Ok(user);
-    }
+    }*/
+
+    /*public async Task<ActionResult<AnalyticsResponse>> GetAnalytics(string email, UserAnalyticsRequests request)
+    {
+        var analyticsEventEntity = new HashSet<EventAnalyticsModule>();
+        var user = await userRepository.FindAsync(email);
+        var events = user.Events
+            .Where(d => d.StartTime >= request.Start && d.EndTime <= request.End)
+            .GroupBy(n => n.Template.Name);
+        int totalHours = default;
+        int totalCount = default;
+        foreach (var group in events)
+        {
+            string name = group.Key;
+            int timeInMinutes = default;
+            int count = group.Count();
+            totalCount += count;
+            foreach (var e in group)
+            {
+                timeInMinutes += (int) (e.EndTime - e.StartTime).Value.TotalMinutes;
+                totalHours += timeInMinutes;
+            }
+
+            analyticsEventEntity.Add
+            (
+                new EventAnalyticsModule
+                (
+                    name,
+                    timeInMinutes,
+                    timeInMinutes / 60,
+                    timeInMinutes * 60,
+                    count
+                )
+            );
+        }
+
+        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalHours));
+    }*/
 }

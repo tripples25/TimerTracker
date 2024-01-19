@@ -33,4 +33,6 @@ public class UserRepository : IUserRepository
     public void Remove(UserEntity? userEntity)
         => context.Users.Remove(userEntity);
 
+    public EntityEntry<UserEntity> Update(UserEntity? userEntity)
+        => context.Users.Update(userEntity);
 }
