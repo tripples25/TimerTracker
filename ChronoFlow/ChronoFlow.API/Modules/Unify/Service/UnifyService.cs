@@ -40,7 +40,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     {
         var dbEntity = await repository.FindAsync(requestEntity.Id);
         var isCreated = dbEntity != null; // True - обновить, False - создать
-
+        
         if (isCreated)
             mapper.Map(requestEntity, dbEntity);
         else
