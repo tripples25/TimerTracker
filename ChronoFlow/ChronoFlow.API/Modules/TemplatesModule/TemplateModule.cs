@@ -10,6 +10,7 @@ public class TemplateModule : IModule
     {
         services.AddScoped<IUnifyService<TemplateEntity>, UnifyService<TemplateEntity>>();
         services.AddScoped<IUnifyRepository<TemplateEntity>, UnifyRepository<TemplateEntity>>();
+        services.AddAutoMapper(typeof(TemplateMapping));
 
         return services;
     }

@@ -11,8 +11,7 @@ public class EventModule : IModule
         services.AddScoped<IUnifyService<EventEntity>, UnifyService<EventEntity>>();
         services.AddScoped<IUnifyRepository<EventEntity>, UnifyRepository<EventEntity>>();
         services.AddAutoMapper(typeof(EventsMapping));
-        // services.AddTransient<EventConverter>();
-
+        
         return services;
     }
 }

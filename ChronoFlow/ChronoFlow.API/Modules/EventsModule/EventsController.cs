@@ -21,8 +21,6 @@ public class EventsController : ControllerBase
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
     {
-        //var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
-
         return service.GetAll();
     }
 
@@ -38,4 +36,12 @@ public class EventsController : ControllerBase
     [HttpDelete("{id:Guid}")]
     public Task<ActionResult> DeleteEvent([FromBody] Guid id)
         => service.Delete(id);
+
+    /*public Task<ActionResult<IEnumerable<EventDto>>> GetAllFiltered()
+    {
+        var events = service.GetAll();
+        var eventsDto = mapper.Map<List<EventDto>>(events);
+        return Ok(eventsDto);
+    }*/
 }
+

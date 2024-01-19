@@ -6,6 +6,6 @@ public interface IEntity<T>
 {
     [Key]
     public Guid Id { get; set; }
-    void UpdateFieldsFromEntity(T? dbEntity);
-    void CreateFieldsFromEntity(T? dbEntity);
+    void Update(T? dbEntity);
+    void Create(T? dbEntity);
 }
