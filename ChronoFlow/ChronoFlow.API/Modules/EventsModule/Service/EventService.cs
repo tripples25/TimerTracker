@@ -63,20 +63,23 @@ public class EventService : ControllerBase, IEventService
         var analyticsEventEntity = new HashSet<EventAnalyticsModule>();
         var user = await userRepository.FindAsync(email);
         var events = user.Events
-            .Where(d => d.StartTime.Day >= request.Start.Day && d.EndTime.Value.Day <= request.End.Day)
+            .Where(
+                d => d.EndTime != null 
+                     && d.StartTime.Day >= request.Start.Day 
+                     && d.EndTime.Value.Day <= request.End.Day)
             .GroupBy(n => n.Template.Name);
-        int totalHours = default;
+        int totalSeconds = default;
         int totalCount = default;
         foreach (var group in events)
         {
             string name = group.Key;
-            int timeInMinutes = default;
+            int timeInSec = default;
             int count = group.Count();
             totalCount += count;
             foreach (var e in group)
             {
-                timeInMinutes += (int)(e.EndTime - e.StartTime).Value.TotalMinutes;
-                totalHours += timeInMinutes;
+                timeInSec += (int) (e.EndTime - e.StartTime).Value.TotalSeconds;
+                totalSeconds += timeInSec;
             }
 
             analyticsEventEntity.Add
@@ -85,15 +88,15 @@ public class EventService : ControllerBase, IEventService
                 (
                     name,
                     new TimeSpan(
-                        timeInMinutes / 60,
-                        timeInMinutes,
-                        timeInMinutes * 60),
+                        0,
+                        0,
+                        timeInSec),
                     count
                 )
             );
         }
 
-        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalHours / 60));
+        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalSeconds/60));
     }
 
     public async Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents(EventDateFilterRequest request)
