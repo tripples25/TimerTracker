@@ -1,5 +1,6 @@
-﻿using AutoMapper;
-using ChronoFlow.API.DAL.Entities;
+﻿using ChronoFlow.API.DAL.Entities;
+using ChronoFlow.API.Modules.EventsModule.Response;
+using ChronoFlow.API.Modules.EventsModule.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoFlow.API.Modules.EventsModule;
@@ -8,23 +9,20 @@ namespace ChronoFlow.API.Modules.EventsModule;
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
 {
+    private readonly IEventService eventService;
     private readonly IUnifyService<EventEntity> service;
-    private readonly IMapper mapper;
 
-    public EventsController(IUnifyService<EventEntity> service,
-        IMapper mapper)
+    public EventsController(
+        IUnifyService<EventEntity> service,
+        IEventService eventService)
     {
         this.service = service;
-        this.mapper = mapper;
+        this.eventService = eventService;
     }
 
     [HttpGet]
     public Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
-    {
-        //var res = mapper.Map<EventEntity>(new DateRange() {Start = DateTime.MinValue, End = DateTime.MaxValue});
-
-        return service.GetAll();
-    }
+        => service.GetAll();
 
     [HttpGet("{id:guid}")]
     public Task<ActionResult<EventEntity>> GetEvent([FromRoute] Guid id)
@@ -38,4 +36,26 @@ public class EventsController : ControllerBase
     [HttpDelete("{id:Guid}")]
     public Task<ActionResult> DeleteEvent([FromBody] Guid id)
         => service.Delete(id);
+
+    [HttpPost("{id:Guid}/stopTracking")]
+    public Task<ActionResult<EventEntity>> StopTracking([FromRoute] Guid id)
+        => eventService.StopTracking(id);
+
+    [HttpPost("addToUser")]
+    public Task<ActionResult<UserEntity>> AddUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
+        => eventService.AddUserEvent(email, eventGuid);
+
+    [HttpDelete("deleteFromUser")]
+    public Task<ActionResult<UserEntity>> DeleteUserEvent([FromQuery] string email, [FromQuery] Guid eventGuid)
+        => eventService.DeleteUserEvent(email, eventGuid);
+
+    [HttpGet("analytics")]
+    public Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string email,
+        [FromQuery] EventDateFilterRequest requests)
+        => eventService.GetAnalytics(email, requests);
+
+    [HttpGet("filter")]
+    public Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents(
+        [FromQuery] EventDateFilterRequest request)
+        => eventService.GetEvents(request);
 }

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChronoFlow.API.Modules.UserModule.Repository;
 
-
 public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext context;
@@ -33,4 +32,6 @@ public class UserRepository : IUserRepository
     public void Remove(UserEntity? userEntity)
         => context.Users.Remove(userEntity);
 
+    public EntityEntry<UserEntity> Update(UserEntity? userEntity)
+        => context.Users.Update(userEntity);
 }

@@ -1,80 +1,114 @@
-﻿/*using ChronoFlow.API.DAL;
-using ChronoFlow.API.DAL.Entities;
-using ChronoFlow.API.DAL.Entities.Response;
+﻿using ChronoFlow.API.DAL.Entities;
+using ChronoFlow.API.Modules.EventsModule.Response;
+using ChronoFlow.API.Modules.EventsModule.Responses;
+using ChronoFlow.API.Modules.UserModule.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IEventRepository eventRepository;
-    
-    public EventService( IEventRepository eventRepository)
+    private readonly IUnifyRepository<EventEntity> eventRepository;
+    private readonly IUserRepository userRepository;
+
+    public EventService(IUnifyRepository<EventEntity> eventRepository, IUserRepository userRepository)
     {
-        this.context = context;
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
     }
 
-    public async Task<ActionResult<IEnumerable<EventEntity>>> GetEvents()
+    public async Task<ActionResult<EventEntity>> StopTracking(Guid eventId)
     {
-        var data = await eventRepository.ToListAsync();
+        var eventDbEntity = await eventRepository.FindAsync(eventId);
+        var isNotCreated = eventDbEntity == null;
 
-        return Ok(data);
-    }
-
-    public async Task<ActionResult<EventEntity>> GetEvent(Guid id)
-    {
-        var currentEvent = await eventRepository.FirstOrDefaultAsync(id);
-
-        if (currentEvent is null)
-            return NotFound("The event does not exist");
-        return Ok(currentEvent);
-    }
-
-    public async Task<ActionResult<EventEntity>> CreateOrUpdateEvenat(EventEntity eventEntity)
-    {
-        var dbEvent = await eventRepository.FindAsync(eventEntity.Id);
-        var isCreated = false;
-
-        if (dbEvent is null)
+        if (isNotCreated)
         {
-            eventEntity.Id = Guid.Empty;
-            eventEntity.StartTime = eventEntity.StartTime;
-            eventEntity.EndTime = eventEntity.EndTime;
-            isCreated = true;
-
-            await context.Events.AddAsync(eventEntity);
-            await eventRepository.AddAsync(eventEntity);
-        }
-        else
-        {
-            dbEvent.StartTime = eventEntity.StartTime;
-            dbEvent.EndTime = eventEntity.EndTime;
+            return NotFound();
         }
 
-        await context.SaveChangesAsync();
-        await eventRepository.SaveChangesAsync();
-
-        return Ok(new CreateOrUpdateResponse
-        {
-            Id = eventEntity.Id,
-            IsCreated = isCreated
-        });
+        eventDbEntity.EndTime = DateTime.Now;
+        await userRepository.SaveChangesAsync();
+        return Ok();
     }
 
-    public async Task<ActionResult> DeleteEvent(Guid id)
+    public async Task<ActionResult<UserEntity>> AddUserEvent(string email, Guid eventId)
     {
-        var dbEvent = await eventRepository.FindAsync(id);
+        var user = await userRepository.FindAsync(email);
+        var eventEntity = await eventRepository.FindAsync(eventId);
+        if (user == null || eventEntity == null)
+            return NotFound();
 
-        if (dbEvent != null)
-        {
-            context.Events.Remove(dbEvent);
-            await context.SaveChangesAsync();
-            eventRepository.Remove(dbEvent);
-            await eventRepository.SaveChangesAsync();
-        }
+        user.Events.Add(eventEntity);
+        await userRepository.SaveChangesAsync();
+
+        return Ok(user);
+    }
+
+    public async Task<ActionResult<UserEntity>> DeleteUserEvent(string email, Guid eventId)
+    {
+        var user = await userRepository.FindAsync(email);
+        var eventEntity = await eventRepository.FindAsync(eventId);
+        if (user == null)
+            return NotFound();
+
+        user.Events.Remove(eventEntity);
+        await userRepository.SaveChangesAsync();
 
         return NoContent();
     }
-}*/
+
+    public async Task<ActionResult<AnalyticsResponse>> GetAnalytics(string email, EventDateFilterRequest request)
+    {
+        var analyticsEventEntity = new HashSet<EventAnalyticsModule>();
+        var user = await userRepository.FindAsync(email);
+        var events = user.Events
+            .Where(
+                d => d.EndTime != null 
+                     && d.StartTime.Day >= request.Start.Day 
+                     && d.EndTime.Value.Day <= request.End.Day)
+            .GroupBy(n => n.Template.Name);
+        int totalSeconds = default;
+        int totalCount = default;
+        foreach (var group in events)
+        {
+            string name = group.Key;
+            int timeInSec = default;
+            int count = group.Count();
+            totalCount += count;
+            foreach (var e in group)
+            {
+                timeInSec += (int) (e.EndTime - e.StartTime).Value.TotalSeconds;
+                totalSeconds += timeInSec;
+            }
+
+            analyticsEventEntity.Add
+            (
+                new EventAnalyticsModule
+                (
+                    name,
+                    new TimeSpan(
+                        0,
+                        0,
+                        timeInSec),
+                    count
+                )
+            );
+        }
+
+        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalSeconds/60));
+    }
+
+    public async Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents(EventDateFilterRequest request)
+    {
+        var result = new HashSet<EventDateFilterResponse>();
+        var events = await eventRepository.ToListAsync();
+        events = events.Where(e => e.EndTime != null).ToList();
+        foreach (var e in events)
+        {
+            result.Add(new EventDateFilterResponse(e.Template.Name, e.EndTime - e.StartTime));
+        }
+
+        return result;
+    }
+}

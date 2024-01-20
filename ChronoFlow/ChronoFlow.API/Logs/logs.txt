@@ -1,0 +1,59 @@
+2024-01-20 19:43:30,979 INFO ChronoFlow.API.Modules.UnifyService`1[[ChronoFlow.API.DAL.Entities.EventEntity, ChronoFlow.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]] - GET request for all entites received
+2024-01-20 19:44:51,135 INFO - GET request for all entites received
+2024-01-20 19:51:02,119 ERROR - An error occurred while mapping the entity: EventEntity
+AutoMapper.AutoMapperMappingException: Error mapping types.
+
+Mapping types:
+EventEntity -> EventEntity
+ChronoFlow.API.DAL.Entities.EventEntity -> ChronoFlow.API.DAL.Entities.EventEntity
+
+Type Map configuration:
+EventEntity -> EventEntity
+ChronoFlow.API.DAL.Entities.EventEntity -> ChronoFlow.API.DAL.Entities.EventEntity
+
+Destination Member:
+Template
+
+ ---> AutoMapper.AutoMapperMappingException: Error mapping types.
+
+Mapping types:
+TemplateEntity -> TemplateEntity
+ChronoFlow.API.DAL.Entities.TemplateEntity -> ChronoFlow.API.DAL.Entities.TemplateEntity
+
+Type Map configuration:
+TemplateEntity -> TemplateEntity
+ChronoFlow.API.DAL.Entities.TemplateEntity -> ChronoFlow.API.DAL.Entities.TemplateEntity
+
+Destination Member:
+Events
+
+ ---> System.InvalidOperationException: The property 'TemplateEntity.Id' is part of a key and so cannot be modified or marked as modified. To change the principal of an existing entity with an identifying foreign key, first delete the dependent and invoke 'SaveChanges', and then associate the dependent with the new principal.
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.InternalEntityEntry.SetPropertyModified(IProperty property, Boolean changeState, Boolean isModified, Boolean isConceptualNull, Boolean acceptChanges)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.ChangeDetector.DetectValueChange(InternalEntityEntry entry, IProperty property)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.ChangeDetector.LocalDetectChanges(InternalEntityEntry entry)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.ChangeDetector.DetectChanges(InternalEntityEntry entry, HashSet`1 visited)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.ChangeDetector.DetectChanges(InternalEntityEntry entry)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry.DetectChanges()
+   at Microsoft.EntityFrameworkCore.DbContext.TryDetectChanges(EntityEntry entry)
+   at Microsoft.EntityFrameworkCore.DbContext.Entry(Object entity)
+   at Microsoft.EntityFrameworkCore.Infrastructure.Internal.LazyLoader.ShouldLoad(Object entity, String navigationName, NavigationEntry& navigationEntry)
+   at Microsoft.EntityFrameworkCore.Infrastructure.Internal.LazyLoader.Load(Object entity, String navigationName)
+   at Microsoft.EntityFrameworkCore.Proxies.Internal.LazyLoadingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.TemplateEntityProxy.get_Events()
+   at lambda_method211(Closure, TemplateEntity, TemplateEntity, ResolutionContext)
+   --- End of inner exception stack trace ---
+   at lambda_method211(Closure, TemplateEntity, TemplateEntity, ResolutionContext)
+   at lambda_method210(Closure, EventEntity, EventEntity, ResolutionContext)
+   --- End of inner exception stack trace ---
+   at lambda_method210(Closure, EventEntity, EventEntity, ResolutionContext)
+   at ChronoFlow.API.Modules.UnifyService`1.CreateOrUpdate(T requestEntity)
+2024-01-20 20:07:20,723 INFO - GET request for all entites received
+2024-01-20 20:15:57,571 INFO - The user not found
+2024-01-20 20:24:11,134 INFO - GET request for specify user
+2024-01-20 20:28:37,887 INFO - The user was successfully added
+2024-01-20 20:28:42,707 INFO - The user was login successfully
+2024-01-20 20:29:06,427 INFO - The entity was successfully created: EventEntity
+2024-01-20 20:29:14,196 INFO - The entity was successfully created: EventEntity
+2024-01-20 20:29:22,997 INFO - The entity was successfully created: EventEntity
+2024-01-20 20:31:53,704 INFO - The entity was successfully created: EventEntity

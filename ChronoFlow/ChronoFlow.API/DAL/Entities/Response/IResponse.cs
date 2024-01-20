@@ -3,5 +3,4 @@
 public interface IResponse
 {
     public Guid Id { get; set; }
-    //public string EntityType { get; set; }
 }
