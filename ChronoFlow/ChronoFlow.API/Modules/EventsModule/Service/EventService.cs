@@ -1,11 +1,9 @@
-﻿using ChronoFlow.API.DAL;
-using ChronoFlow.API.DAL.Entities;
+﻿using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.Modules.EventsModule.Response;
 using ChronoFlow.API.Modules.EventsModule.Responses;
 using ChronoFlow.API.Modules.UserModule.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+
 namespace ChronoFlow.API.Modules.EventsModule;
 
 public class EventService : ControllerBase, IEventService
@@ -28,6 +26,7 @@ public class EventService : ControllerBase, IEventService
         {
             return NotFound();
         }
+
         eventDbEntity.EndTime = DateTime.Now;
         await userRepository.SaveChangesAsync();
         return Ok();
@@ -76,7 +75,7 @@ public class EventService : ControllerBase, IEventService
             totalCount += count;
             foreach (var e in group)
             {
-                timeInMinutes += (int) (e.EndTime - e.StartTime).Value.TotalMinutes;
+                timeInMinutes += (int)(e.EndTime - e.StartTime).Value.TotalMinutes;
                 totalHours += timeInMinutes;
             }
 
@@ -86,26 +85,27 @@ public class EventService : ControllerBase, IEventService
                 (
                     name,
                     new TimeSpan(
-                    timeInMinutes / 60,
-                    timeInMinutes,
-                    timeInMinutes * 60),
+                        timeInMinutes / 60,
+                        timeInMinutes,
+                        timeInMinutes * 60),
                     count
                 )
             );
         }
 
-        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalHours/60));
+        return Ok(new AnalyticsResponse(analyticsEventEntity, totalCount, totalHours / 60));
     }
 
     public async Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents(EventDateFilterRequest request)
-    {   
-        var result = new HashSet<EventDateFilterResponse> ();
+    {
+        var result = new HashSet<EventDateFilterResponse>();
         var events = await eventRepository.ToListAsync();
         events = events.Where(e => e.EndTime != null).ToList();
-        foreach(var e in events)
+        foreach (var e in events)
         {
             result.Add(new EventDateFilterResponse(e.Template.Name, e.EndTime - e.StartTime));
         }
+
         return result;
     }
 }

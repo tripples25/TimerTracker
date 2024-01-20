@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoFlow.API.Modules;
 
@@ -9,5 +8,4 @@ public interface IUnifyService<T>
     Task<ActionResult<T>> Get([FromRoute] Guid id);
     Task<ActionResult<T>> CreateOrUpdate([FromBody] T eventEntity);
     Task<ActionResult> Delete([FromBody] Guid id);
-
 }

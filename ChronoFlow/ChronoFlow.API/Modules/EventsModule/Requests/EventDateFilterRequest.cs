@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-
-namespace ChronoFlow.API.Modules.EventsModule.Response
+﻿namespace ChronoFlow.API.Modules.EventsModule.Response
 {
     public class EventDateFilterRequest
     {

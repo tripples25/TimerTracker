@@ -8,8 +8,7 @@
             Time = time;
         }
 
-        public string Name {  get; set; }
+        public string Name { get; set; }
         public TimeSpan? Time { get; set; }
-
     }
 }

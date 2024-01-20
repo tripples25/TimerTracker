@@ -1,6 +1,4 @@
-﻿using ChronoFlow.API.Modules.EventsModule;
-
-namespace ChronoFlow.API.Modules.EventsModule.Responses
+﻿namespace ChronoFlow.API.Modules.EventsModule.Responses
 {
     public class AnalyticsResponse
     {
@@ -14,6 +12,5 @@ namespace ChronoFlow.API.Modules.EventsModule.Responses
         public HashSet<EventAnalyticsModule> Events { get; set; }
         public int TotalCount { get; set; }
         public int TotalHours { get; set; }
-
     }
 }

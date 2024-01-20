@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChronoFlow.API.Modules;
 
-public class UnifyRepository<T> : IUnifyRepository<T> 
+public class UnifyRepository<T> : IUnifyRepository<T>
     where T : class, IEntity<T>
 {
     private readonly ApplicationDbContext context;
     private DbSet<T> set => context.Set<T>();
-    
+
     public UnifyRepository(ApplicationDbContext context)
     {
         this.context = context;
@@ -33,10 +33,8 @@ public class UnifyRepository<T> : IUnifyRepository<T>
     {
         var query = set.AsQueryable();
 
-        foreach (var includeExpression in includeExpressions)
-        {
-            query = query.Include(includeExpression);
-        }
+        query = includeExpressions.Aggregate(query, (current, includeExpression)
+            => current.Include(includeExpression));
 
         return await query.FirstOrDefaultAsync(e => e.Id == id);
     }

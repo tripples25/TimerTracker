@@ -3,7 +3,6 @@ using ChronoFlow.API.Modules.UserModule.Requests;
 using ChronoFlow.API.Modules.UserModule.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace ChronoFlow.API.Modules.UserModule;
 
@@ -51,8 +50,4 @@ public class UsersController : ControllerBase
     [HttpPost]
     public Task<ActionResult<UserEntity>> CreateOrUpdateUser([FromBody] UserEntity userEntity)
         => usersService.CreateOrUpdateUser(userEntity);
-
-
-
-
-}   
+}

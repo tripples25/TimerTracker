@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChronoFlow.API.Modules.UserModule.Repository;
 
-
 public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext context;

@@ -12,7 +12,7 @@ public class UserModule : IModule
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddAutoMapper(typeof(UsersMapping));
-        
+
         return services;
     }
 }

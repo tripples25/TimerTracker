@@ -12,5 +12,4 @@ public interface IEventService
     Task<ActionResult<UserEntity>> DeleteUserEvent(string email, Guid eventId);
     Task<ActionResult<AnalyticsResponse>> GetAnalytics(string email, EventDateFilterRequest request);
     Task<ActionResult<IEnumerable<EventDateFilterResponse>>> GetEvents(EventDateFilterRequest request);
-
 }

@@ -12,5 +12,4 @@ public interface IUserRepository
     public Task<List<UserEntity>> ToListAsync();
     public void Remove(UserEntity userEntity);
     public EntityEntry<UserEntity> Update(UserEntity userEntity);
-
 }

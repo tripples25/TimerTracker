@@ -1,9 +1,7 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
-using Catalyst.Models;
+﻿using AutoMapper;
 using ChronoFlow.API.DAL.Entities;
 using ChronoFlow.API.DAL.Entities.Response;
-using ChronoFlow.API.Modules.EventsModule;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoFlow.API.Modules;
@@ -12,6 +10,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
 {
     private readonly IUnifyRepository<T> repository;
     private readonly IMapper mapper;
+    private static readonly ILog log = LogManager.GetLogger(typeof(UnifyService<T>));
 
     public UnifyService(IUnifyRepository<T> repository, IMapper mapper)
     {
@@ -22,7 +21,7 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     public async Task<ActionResult<IEnumerable<T>>> GetAll()
     {
         var data = await repository.ToListAsync();
-
+        log.Info("GET request for all entites received");
         return Ok(data);
     }
 
@@ -31,8 +30,12 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         var entity = await repository.FirstOrDefaultAsync(id);
 
         if (entity is null)
-            return NotFound($"The unknown entity does not exist");
+        {
+            log.Info("GET request for specific entity: the entity was not found");
+            return NotFound("The unknown entity does not exist");
+        }
 
+        log.Info("GET request for all entites received");
         return Ok(entity);
     }
 
@@ -40,12 +43,38 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
     {
         var dbEntity = await repository.FindAsync(requestEntity.Id);
         var isCreated = dbEntity != null; // True - обновить, False - создать
-        
-        if (isCreated)
-            mapper.Map(requestEntity, dbEntity);
-        else
-            await repository.AddAsync(requestEntity);
 
+        if (isCreated)
+        {
+            try
+            {
+                mapper.Map(requestEntity, dbEntity);
+            }
+
+            catch (Exception ex)
+            {
+                log.Error($"An error occurred while mapping the entity: {requestEntity.GetType().Name}", ex);
+                throw;
+            }
+
+            log.Info($"The entity was successfully added: {requestEntity.GetType().Name}");
+        }
+
+        else
+        {
+            try
+            {
+                await repository.AddAsync(requestEntity);
+            }
+
+            catch (Exception ex)
+            {
+                log.Error($"An error occurred while creating the entity: {requestEntity.GetType().Name}", ex);
+                throw;
+            }
+
+            log.Info($"The entity was successfully created: {requestEntity.GetType().Name}");
+        }
 
         await repository.SaveChangesAsync();
 
@@ -63,8 +92,11 @@ public class UnifyService<T> : ControllerBase, IUnifyService<T> where T : class,
         if (dbEntity != null)
         {
             repository.Remove(dbEntity);
+            log.Info($"The entity was successfully deleted: {dbEntity.GetType().Name}");
             await repository.SaveChangesAsync();
         }
+        else
+            log.Info("The entity was not found while deletion");
 
         return NoContent();
     }

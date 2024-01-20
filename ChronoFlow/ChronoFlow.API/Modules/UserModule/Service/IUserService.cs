@@ -14,6 +14,4 @@ public interface IUserService
     Task<ActionResult<UserEntity>> GetUser(string email);
     Task<ActionResult<UserEntity>> CreateOrUpdateUser(UserEntity userEntity);
     Task<ActionResult> DeleteUser(string Email);
-
-
 }
