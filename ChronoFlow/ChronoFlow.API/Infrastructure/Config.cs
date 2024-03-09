@@ -10,13 +10,8 @@ public class Config
 
     public Config(bool isDev)
     {
-        if (isDev)
-        {
-            DatabaseConnectionString = "Server=localhost;Database=TimeTrackerDB;Port=5432;User Id=postgres;Password=1";
-        }
-        else
-        {
-            DatabaseConnectionString = Environment.GetEnvironmentVariable("Connection");
-        }
+        DatabaseConnectionString = isDev
+            ? "Server=localhost;Database=TimeTrackerDB;Port=5432;User Id=postgres;Password=1"
+            : Environment.GetEnvironmentVariable("Connection");
     }
 }
